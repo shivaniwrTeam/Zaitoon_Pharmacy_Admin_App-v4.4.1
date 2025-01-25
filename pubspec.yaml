@@ -1,0 +1,63 @@
+name: admin_eshop
+description: A new Flutter project.
+publish_to: 'none' 
+version: 1.0.0+1
+
+environment:
+  sdk: '>=2.12.0 <3.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  http: ^1.2.0
+  shared_preferences: ^2.3.3
+  connectivity_plus: ^6.1.0
+  #connectivity: ^3.0.6
+  shimmer: ^3.0.0
+  jaguar_jwt: ^3.0.0
+  flutter_html: ^3.0.0-alpha.6
+  url_launcher: ^6.3.1
+  sms_autofill:
+    git:
+      url: https://github.com/jaumard/sms_autofill
+  firebase_auth: ^5.3.4
+  fl_chart: ^0.69.2
+  flutter_local_notifications: ^18.0.1
+  firebase_messaging: ^15.1.6
+  path_provider: ^2.1.2
+  file_picker: ^8.1.4
+  flutter_downloader: ^1.11.8
+  open_filex: ^4.5.0
+  permission_handler: ^11.3.1
+  flutter_html_to_pdf: ^0.7.0
+  sticky_headers: ^0.3.0+2
+  mime: ^2.0.0
+  html_editor_enhanced: ^2.6.0
+  intl_phone_field: ^3.2.0
+  flutter_bloc: ^8.1.6
+  device_info_plus: ^11.1.1
+  flutter_svg: ^2.0.16
+dependency_overrides:
+  intl: ^0.18.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  
+
+flutter:
+
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - lib/Language/
+
+  fonts:
+    - family: opensans
+      fonts:
+        - asset: assets/font/OpenSans-Regular.ttf
