@@ -229,7 +229,9 @@ class _EditProductState extends State<EditProduct>
     brandScrollController.addListener(_brandScrollListener);
     countryScrollController.addListener(_countryScrollListener);
     buttonController = AnimationController(
-        duration: const Duration(milliseconds: 2000), vsync: this,);
+      duration: const Duration(milliseconds: 2000),
+      vsync: this,
+    );
     uploadedVideoName = '';
     otherPhotos = [];
     showOtherImages = [];
@@ -430,7 +432,8 @@ class _EditProductState extends State<EditProduct>
       }
     } else {
       print(
-          "total allow***${widget.model!.totalAllow}****${widget.model!.warranty}*****${widget.model!.gurantee}",);
+        "total allow***${widget.model!.totalAllow}****${widget.model!.warranty}*****${widget.model!.gurantee}",
+      );
       if (widget.model!.totalAllow != null) {
         totalAllowQuantity = widget.model!.totalAllow;
         totalAllowController.text = widget.model!.totalAllow!;
@@ -492,7 +495,8 @@ class _EditProductState extends State<EditProduct>
           final List<String> zipcodes =
               widget.model!.deliverableZipcodes?.split(",") ?? [];
           selectedZipCodes.add(
-              ZipCodeModel(zipcode: zipcodes[i], id: zipCodeIds.elementAt(i)),);
+            ZipCodeModel(zipcode: zipcodes[i], id: zipCodeIds.elementAt(i)),
+          );
         }
         setState(() {});
       }
@@ -511,7 +515,9 @@ class _EditProductState extends State<EditProduct>
       productImageUrl = widget.model!.image!;
       productImageRelativePath = widget.model!.relativeImagePath!;
     }
-    if (widget.model!.taxId != null && widget.model!.taxId!.isNotEmpty) {
+    if (widget.model!.taxId != null &&
+        widget.model!.taxId!.isNotEmpty &&
+        widget.model!.taxId != "0") {
       final Set<String> taxIds =
           widget.model!.taxId!.split(',').map((e) => e.trim()).toSet();
       print("taxIds: $taxIds");
@@ -624,7 +630,8 @@ class _EditProductState extends State<EditProduct>
           for (int i = 0; i < index; i++) {
             final oldListOfAttributeValueID =
                 widget.model!.attributeList![i].id.toString().split(',');
-            final String? oldattributename = widget.model!.attributeList![i].name;
+            final String? oldattributename =
+                widget.model!.attributeList![i].name;
             _attrController.add(
               TextEditingController(text: oldattributename),
             );
@@ -691,7 +698,8 @@ class _EditProductState extends State<EditProduct>
           for (int i = 0; i < index; i++) {
             final oldListOfAttributeValueID =
                 widget.model!.attributeList![i].id.toString().split(',');
-            final String? oldattributename = widget.model!.attributeList![i].name;
+            final String? oldattributename =
+                widget.model!.attributeList![i].name;
             _attrController.add(TextEditingController(text: oldattributename));
             variationBoolList.add(true);
             final attributes = attributesList
@@ -743,7 +751,8 @@ class _EditProductState extends State<EditProduct>
           for (int i = 0; i < index; i++) {
             final oldListOfAttributeValueID =
                 widget.model!.attributeList![i].id.toString().split(',');
-            final String? oldattributename = widget.model!.attributeList![i].name;
+            final String? oldattributename =
+                widget.model!.attributeList![i].name;
             _attrController.add(TextEditingController(text: oldattributename));
             variationBoolList.add(true);
             final attributes = attributesList
@@ -858,7 +867,8 @@ class _EditProductState extends State<EditProduct>
               )
               .toList();
         } else {
-          setsnackbar(getTranslated(context, somethingMSg)!, context);
+          return error;
+          // setsnackbar(getTranslated(context, somethingMSg)!, context);
         }
         setState(
           () {},
@@ -890,7 +900,8 @@ class _EditProductState extends State<EditProduct>
           }
           setState(() {});
         } else {
-          setsnackbar(getTranslated(context, somethingMSg)!, context);
+          return error;
+          // setsnackbar(getTranslated(context, somethingMSg)!, context);
         }
       } on TimeoutException catch (_) {
         setsnackbar(getTranslated(context, somethingMSg)!, context);
@@ -915,7 +926,8 @@ class _EditProductState extends State<EditProduct>
               )
               .toList();
         } else {
-          setsnackbar(getTranslated(context, somethingMSg)!, context);
+          return error;
+          // setsnackbar(getTranslated(context, somethingMSg)!, context);
         }
       } on TimeoutException catch (_) {
         setsnackbar(getTranslated(context, somethingMSg)!, context);
@@ -1117,7 +1129,7 @@ class _EditProductState extends State<EditProduct>
                 controller: identificationofProductControlller,
                 textInputAction: TextInputAction.newline,
                 keyboardType: TextInputType.multiline,
-                validator: (val) => validateThisFieldRequered(val, context),
+                // validator: (val) => validateThisFieldRequered(val, context),
                 onChanged: (value) {
                   IdentificationofProduct = value;
                 },
@@ -1254,7 +1266,10 @@ class _EditProductState extends State<EditProduct>
                               ],
                             )
                           : Text(
-                              selectedTax.map((e) => '${e.title} (${e.percentage}%)').join(','),),
+                              selectedTax
+                                  .map((e) => '${e.title} (${e.percentage}%)')
+                                  .join(','),
+                            ),
                     ),
                     const Icon(
                       Icons.arrow_drop_down,
@@ -1268,29 +1283,32 @@ class _EditProductState extends State<EditProduct>
               },
             ),
           ),
-          if (selectedTax.isEmpty) Container() else Row(
-                  children: [
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    InkWell(
-                      onTap: () {
-                        setState(
-                          () {
-                            selectedTax.clear();
-                          },
-                        );
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          border: Border.all(color: fontColor),
-                        ),
-                        child: const Icon(Icons.close, color: red),
-                      ),
-                    ),
-                  ],
+          if (selectedTax.isEmpty)
+            Container()
+          else
+            Row(
+              children: [
+                const SizedBox(
+                  width: 10,
                 ),
+                InkWell(
+                  onTap: () {
+                    setState(
+                      () {
+                        selectedTax.clear();
+                      },
+                    );
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      border: Border.all(color: fontColor),
+                    ),
+                    child: const Icon(Icons.close, color: red),
+                  ),
+                ),
+              ],
+            ),
         ],
       ),
     );
@@ -1373,24 +1391,25 @@ class _EditProductState extends State<EditProduct>
         .asMap()
         .map(
           (index, element) => MapEntry(
-              index,
-              CheckboxListTile(
-                  activeColor: primary,
-                  value: selectedTax.contains(element),
-                  title: Text(
-                    "${taxesList[index].title!} (${taxesList[index].percentage!}%)",
-                  ),
-                  onChanged: (bool? val) {
-                    setState(() {
-                      if (selectedTax.contains(element)) {
-                        selectedTax.remove(element);
-                      } else {
-                        selectedTax.add(element);
-                      }
-                      updateParentState();
-                    });
-                  },),
-              /*InkWell(
+            index,
+            CheckboxListTile(
+              activeColor: primary,
+              value: selectedTax.contains(element),
+              title: Text(
+                "${taxesList[index].title!} (${taxesList[index].percentage!}%)",
+              ),
+              onChanged: (bool? val) {
+                setState(() {
+                  if (selectedTax.contains(element)) {
+                    selectedTax.remove(element);
+                  } else {
+                    selectedTax.add(element);
+                  }
+                  updateParentState();
+                });
+              },
+            ),
+            /*InkWell(
               onTap: () {
                 if (!flag) {
                   flag = true;
@@ -1428,7 +1447,7 @@ class _EditProductState extends State<EditProduct>
               ),
             ),
           */
-              ),
+          ),
         )
         .values
         .toList();
@@ -1459,15 +1478,18 @@ class _EditProductState extends State<EditProduct>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    if (indicatorValue.toString().isNotEmpty) Text(
-                            indicatorValue == '0'
-                                ? getTranslated(context, None)!
-                                : indicatorValue == '1'
-                                    ? getTranslated(context, Veg)!
-                                    : getTranslated(context, nonVeg)!,
-                          ) else Text(
-                            getTranslated(context, SelectIndicator)!,
-                          ),
+                    if (indicatorValue.toString().isNotEmpty)
+                      Text(
+                        indicatorValue == '0'
+                            ? getTranslated(context, None)!
+                            : indicatorValue == '1'
+                                ? getTranslated(context, Veg)!
+                                : getTranslated(context, nonVeg)!,
+                      )
+                    else
+                      Text(
+                        getTranslated(context, SelectIndicator)!,
+                      ),
                   ],
                 ),
               ),
@@ -1502,7 +1524,8 @@ class _EditProductState extends State<EditProduct>
               content: SingleChildScrollView(
                 child: Padding(
                   padding: EdgeInsets.only(
-                      bottom: MediaQuery.of(context).viewInsets.bottom,),
+                    bottom: MediaQuery.of(context).viewInsets.bottom,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
@@ -1523,101 +1546,114 @@ class _EditProductState extends State<EditProduct>
                         ),
                       ),
                       const Divider(color: lightBlack),
-                      if (suggessionisNoData) getNoItem() else SizedBox(
-                              width: double.maxFinite,
-                              height: attributeSetList.isNotEmpty
-                                  ? MediaQuery.of(context).size.height * 0.3
-                                  : 0,
-                              child: SingleChildScrollView(
-                                child: ListView.builder(
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  itemCount: attributeSetList.length,
-                                  itemBuilder: (context, index) {
-                                    final List<AttributeModel> attrList = [];
-                                    final AttributeSetModel item =
-                                        attributeSetList[index];
-                                    for (int i = 0;
-                                        i < attributesList.length;
-                                        i++) {
-                                      if (item.id ==
-                                          attributesList[i].attributeSetId) {
-                                        attrList.add(attributesList[i]);
-                                      }
-                                    }
-                                    return Material(
-                                      child: StickyHeaderBuilder(
-                                        builder: (BuildContext context,
-                                            double stuckAmount,) {
-                                          return Container(
-                                            decoration: BoxDecoration(
-                                                color: primary,
-                                                borderRadius:
-                                                    BorderRadius.circular(5),),
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 8.0, vertical: 2,),
-                                            alignment: Alignment.centerLeft,
-                                            child: Text(
-                                              attributeSetList[index].name ??
-                                                  '',
-                                              style: const TextStyle(
-                                                  color: Colors.white,),
+                      if (suggessionisNoData)
+                        getNoItem()
+                      else
+                        SizedBox(
+                          width: double.maxFinite,
+                          height: attributeSetList.isNotEmpty
+                              ? MediaQuery.of(context).size.height * 0.3
+                              : 0,
+                          child: SingleChildScrollView(
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: attributeSetList.length,
+                              itemBuilder: (context, index) {
+                                final List<AttributeModel> attrList = [];
+                                final AttributeSetModel item =
+                                    attributeSetList[index];
+                                for (int i = 0;
+                                    i < attributesList.length;
+                                    i++) {
+                                  if (item.id ==
+                                      attributesList[i].attributeSetId) {
+                                    attrList.add(attributesList[i]);
+                                  }
+                                }
+                                return Material(
+                                  child: StickyHeaderBuilder(
+                                    builder: (
+                                      BuildContext context,
+                                      double stuckAmount,
+                                    ) {
+                                      return Container(
+                                        decoration: BoxDecoration(
+                                          color: primary,
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                        ),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8.0,
+                                          vertical: 2,
+                                        ),
+                                        alignment: Alignment.centerLeft,
+                                        child: Text(
+                                          attributeSetList[index].name ?? '',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    content: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: List<int>.generate(
+                                        attrList.length,
+                                        (i) => i,
+                                      ).map(
+                                        (item) {
+                                          return InkWell(
+                                            onTap: () {
+                                              setState(
+                                                () {
+                                                  _attrController[pos].text =
+                                                      attrList[item].name!;
+                                                  attributeIndiacator = pos + 1;
+                                                  if (!attrId.contains(
+                                                    int.parse(
+                                                      attrList[item].id!,
+                                                    ),
+                                                  )) {
+                                                    attrId.add(
+                                                      int.parse(
+                                                        attrList[item].id!,
+                                                      ),
+                                                    );
+                                                    Navigator.pop(context);
+                                                  } else {
+                                                    setsnackbar(
+                                                      getTranslated(
+                                                        context,
+                                                        alredyInserted,
+                                                      )!,
+                                                      context,
+                                                    );
+                                                  }
+                                                },
+                                              );
+                                            },
+                                            child: Container(
+                                              width: double.maxFinite,
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Text(
+                                                attrList[item].name ?? '',
+                                                textAlign: TextAlign.start,
+                                              ),
                                             ),
                                           );
                                         },
-                                        content: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: List<int>.generate(
-                                              attrList.length, (i) => i,).map(
-                                            (item) {
-                                              return InkWell(
-                                                onTap: () {
-                                                  setState(
-                                                    () {
-                                                      _attrController[pos]
-                                                              .text =
-                                                          attrList[item].name!;
-                                                      attributeIndiacator =
-                                                          pos + 1;
-                                                      if (!attrId.contains(
-                                                          int.parse(
-                                                              attrList[item]
-                                                                  .id!,),)) {
-                                                        attrId.add(int.parse(
-                                                            attrList[item]
-                                                                .id!,),);
-                                                        Navigator.pop(context);
-                                                      } else {
-                                                        setsnackbar(
-                                                            getTranslated(
-                                                                context,
-                                                                alredyInserted,)!,
-                                                            context,);
-                                                      }
-                                                    },
-                                                  );
-                                                },
-                                                child: Container(
-                                                  width: double.maxFinite,
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: Text(
-                                                    attrList[item].name ?? '',
-                                                    textAlign: TextAlign.start,
-                                                  ),
-                                                ),
-                                              );
-                                            },
-                                          ).toList(),
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
+                                      ).toList(),
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
+                          ),
+                        ),
                     ],
                   ),
                 ),
@@ -1681,7 +1717,11 @@ class _EditProductState extends State<EditProduct>
                               width: double.maxFinite,
                               child: Padding(
                                 padding: const EdgeInsets.fromLTRB(
-                                    20.0, 20.0, 20.0, 20.0,),
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                ),
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -1707,7 +1747,11 @@ class _EditProductState extends State<EditProduct>
                               width: double.maxFinite,
                               child: Padding(
                                 padding: const EdgeInsets.fromLTRB(
-                                    20.0, 20.0, 20.0, 20.0,),
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                ),
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -1733,7 +1777,11 @@ class _EditProductState extends State<EditProduct>
                               width: double.maxFinite,
                               child: Padding(
                                 padding: const EdgeInsets.fromLTRB(
-                                    20.0, 20.0, 20.0, 20.0,),
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                ),
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -2165,49 +2213,53 @@ class _EditProductState extends State<EditProduct>
                     ],
                   ),
                   const Divider(), */
-                  if (countryLoading) const Center(
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(vertical: 50.0),
-                            child: CircularProgressIndicator(),
-                          ),
-                        ) else (countryList.isNotEmpty)
-                          ? Flexible(
-                              child: SizedBox(
-                                height:
-                                    MediaQuery.of(context).size.height * 0.8,
-                                child: SingleChildScrollView(
-                                  controller: countryScrollController,
-                                  child: Stack(
-                                    children: [
-                                      Column(
-                                        children: [
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: getCountryList(
-                                                setStater, context,),
+                  if (countryLoading)
+                    const Center(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 50.0),
+                        child: CircularProgressIndicator(),
+                      ),
+                    )
+                  else
+                    (countryList.isNotEmpty)
+                        ? Flexible(
+                            child: SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.8,
+                              child: SingleChildScrollView(
+                                controller: countryScrollController,
+                                child: Stack(
+                                  children: [
+                                    Column(
+                                      children: [
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: getCountryList(
+                                            setStater,
+                                            context,
                                           ),
-                                          if (isLoadingMoreCountry!)
-                                            const Center(
-                                              child: Padding(
-                                                padding: EdgeInsets.symmetric(
-                                                    vertical: 50.0,),
-                                                child:
-                                                    CircularProgressIndicator(),
+                                        ),
+                                        if (isLoadingMoreCountry!)
+                                          const Center(
+                                            child: Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                vertical: 50.0,
                                               ),
+                                              child:
+                                                  CircularProgressIndicator(),
                                             ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
+                                          ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
                               ),
-                            )
-                          : Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 20.0),
-                              child: getNoItem(),
                             ),
+                          )
+                        : Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 20.0),
+                            child: getNoItem(),
+                          ),
                 ],
               ),
             );
@@ -2379,7 +2431,7 @@ class _EditProductState extends State<EditProduct>
               onChanged: (String? value) {
                 warrantyPeriod = value;
               },
-              validator: (val) => validateThisFieldRequered(val, context),
+              // validator: (val) => validateThisFieldRequered(val, context),
               decoration: InputDecoration(
                 filled: true,
                 fillColor: lightWhite,
@@ -2444,7 +2496,7 @@ class _EditProductState extends State<EditProduct>
               onChanged: (String? value) {
                 guaranteePeriod = value;
               },
-              validator: (val) => validateThisFieldRequered(val, context),
+              // validator: (val) => validateThisFieldRequered(val, context),
               decoration: InputDecoration(
                 filled: true,
                 fillColor: lightWhite,
@@ -2506,19 +2558,26 @@ class _EditProductState extends State<EditProduct>
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             if (deliverabletypeValue != null &&
-                                    deliverabletypeValue.toString().isNotEmpty) Text(
-                                    deliverabletypeValue == '0'
-                                        ? getTranslated(context, None)!
-                                        : deliverabletypeValue == '1'
-                                            ? getTranslated(context, All)!
-                                            : deliverabletypeValue == '2'
-                                                ? getTranslated(
-                                                    context, IncludeText,)!
-                                                : getTranslated(
-                                                    context, ExcludeText,)!,
-                                  ) else Text(
-                                    getTranslated(context, SelectIndicator)!,
-                                  ),
+                                deliverabletypeValue.toString().isNotEmpty)
+                              Text(
+                                deliverabletypeValue == '0'
+                                    ? getTranslated(context, None)!
+                                    : deliverabletypeValue == '1'
+                                        ? getTranslated(context, All)!
+                                        : deliverabletypeValue == '2'
+                                            ? getTranslated(
+                                                context,
+                                                IncludeText,
+                                              )!
+                                            : getTranslated(
+                                                context,
+                                                ExcludeText,
+                                              )!,
+                              )
+                            else
+                              Text(
+                                getTranslated(context, SelectIndicator)!,
+                              ),
                           ],
                         ),
                       ),
@@ -2593,7 +2652,11 @@ class _EditProductState extends State<EditProduct>
                               width: double.maxFinite,
                               child: Padding(
                                 padding: const EdgeInsets.fromLTRB(
-                                    20.0, 20.0, 20.0, 20.0,),
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                ),
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -2619,7 +2682,11 @@ class _EditProductState extends State<EditProduct>
                               width: double.maxFinite,
                               child: Padding(
                                 padding: const EdgeInsets.fromLTRB(
-                                    20.0, 20.0, 20.0, 20.0,),
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                ),
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -2645,7 +2712,11 @@ class _EditProductState extends State<EditProduct>
                               width: double.maxFinite,
                               child: Padding(
                                 padding: const EdgeInsets.fromLTRB(
-                                    20.0, 20.0, 20.0, 20.0,),
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                ),
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -2671,7 +2742,11 @@ class _EditProductState extends State<EditProduct>
                               width: double.maxFinite,
                               child: Padding(
                                 padding: const EdgeInsets.fromLTRB(
-                                    20.0, 20.0, 20.0, 20.0,),
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                ),
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -2723,31 +2798,39 @@ class _EditProductState extends State<EditProduct>
                               : selectedZipCodes.isEmpty)
                           ? Text(
                               getTranslated(
-                                  context,
-                                  cityWiseDelivery
-                                      ? selectCity
-                                      : SelectZipCodeText,)!,
+                                context,
+                                cityWiseDelivery
+                                    ? selectCity
+                                    : SelectZipCodeText,
+                              )!,
                             )
-                          : Text(cityWiseDelivery
-                              ? (selectedCities.map((e) => e['name']).join(","))
-                              : selectedZipCodes
-                                  .map((e) => e.zipcode)
-                                  .join(','),),
+                          : Text(
+                              cityWiseDelivery
+                                  ? (selectedCities
+                                      .map((e) => e['name'])
+                                      .join(","))
+                                  : selectedZipCodes
+                                      .map((e) => e.zipcode)
+                                      .join(','),
+                            ),
                     ),
                     onTap: () async {
                       if (cityWiseDelivery) {
                         final cityResponse = await showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            shape: const RoundedRectangleBorder(
-                                borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(25),
-                                    topRight: Radius.circular(25),),),
-                            builder: (context) {
-                              return LocationSelectorWidget(
-                                initialCities: selectedCities ,
-                              );
-                            },);
+                          context: context,
+                          isScrollControlled: true,
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(25),
+                              topRight: Radius.circular(25),
+                            ),
+                          ),
+                          builder: (context) {
+                            return LocationSelectorWidget(
+                              initialCities: selectedCities,
+                            );
+                          },
+                        );
                         if (cityResponse != null) {
                           print("Response is $cityResponse");
                           selectedCities = cityResponse;
@@ -2762,22 +2845,25 @@ class _EditProductState extends State<EditProduct>
                 const SizedBox(
                   width: 10,
                 ),
-                if (selectedZipCodes.isEmpty) Container() else InkWell(
-                        onTap: () {
-                          setState(
-                            () {
-                              selectedZipCodes.clear();
-                            },
-                          );
+                if (selectedZipCodes.isEmpty)
+                  Container()
+                else
+                  InkWell(
+                    onTap: () {
+                      setState(
+                        () {
+                          selectedZipCodes.clear();
                         },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                            border: Border.all(color: fontColor),
-                          ),
-                          child: const Icon(Icons.close, color: red),
-                        ),
+                      );
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        border: Border.all(color: fontColor),
                       ),
+                      child: const Icon(Icons.close, color: red),
+                    ),
+                  ),
               ],
             ),
           )
@@ -2901,9 +2987,10 @@ class _EditProductState extends State<EditProduct>
                 ),
                 Container(
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(4),
-                      color: Colors.grey[400],
-                      border: Border.all(color: fontColor),),
+                    borderRadius: BorderRadius.circular(4),
+                    color: Colors.grey[400],
+                    border: Border.all(color: fontColor),
+                  ),
                   width: 200,
                   height: 20,
                   child: Center(
@@ -2931,7 +3018,10 @@ class _EditProductState extends State<EditProduct>
                   ListView.builder(
                     shrinkWrap: true,
                     padding: const EdgeInsetsDirectional.only(
-                        bottom: 5, start: 10, end: 10,),
+                      bottom: 5,
+                      start: 10,
+                      end: 10,
+                    ),
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: catagorylist.length,
                     itemBuilder: (context, index) {
@@ -2995,8 +3085,8 @@ class _EditProductState extends State<EditProduct>
             item1 = model.children!.isEmpty ? null : model.children![index];
             return item1 == null
                 ? Text(
-                  getTranslated(context, nosubcatText)!,
-                )
+                    getTranslated(context, nosubcatText)!,
+                  )
                 : Column(
                     children: [
                       InkWell(
@@ -3035,7 +3125,10 @@ class _EditProductState extends State<EditProduct>
                       ListView.builder(
                         shrinkWrap: true,
                         padding: const EdgeInsetsDirectional.only(
-                            bottom: 5, start: 10, end: 10,),
+                          bottom: 5,
+                          start: 10,
+                          end: 10,
+                        ),
                         physics: const NeverScrollableScrollPhysics(),
                         itemCount: item1.children!.length,
                         itemBuilder: (context, index) {
@@ -3074,8 +3167,7 @@ class _EditProductState extends State<EditProduct>
                                                 fontSize: 15,
                                               ),
                                               maxLines: 1,
-                                              overflow:
-                                                  TextOverflow.ellipsis,
+                                              overflow: TextOverflow.ellipsis,
                                             ),
                                           ),
                                         ],
@@ -3084,9 +3176,12 @@ class _EditProductState extends State<EditProduct>
                                     Container(
                                       child: ListView.builder(
                                         shrinkWrap: true,
-                                        padding: const EdgeInsetsDirectional
-                                            .only(
-                                            bottom: 5, start: 10, end: 10,),
+                                        padding:
+                                            const EdgeInsetsDirectional.only(
+                                          bottom: 5,
+                                          start: 10,
+                                          end: 10,
+                                        ),
                                         physics:
                                             const NeverScrollableScrollPhysics(),
                                         itemCount: item2.children!.length,
@@ -3130,40 +3225,39 @@ class _EditProductState extends State<EditProduct>
                                                       ),
                                                     ),
                                                     Container(
-                                                      child:
-                                                          ListView.builder(
+                                                      child: ListView.builder(
                                                         shrinkWrap: true,
                                                         padding:
                                                             const EdgeInsetsDirectional
                                                                 .only(
-                                                                bottom: 5,
-                                                                start: 10,
-                                                                end: 10,),
+                                                          bottom: 5,
+                                                          start: 10,
+                                                          end: 10,
+                                                        ),
                                                         physics:
                                                             const NeverScrollableScrollPhysics(),
                                                         itemCount: item3
-                                                            .children!
-                                                            .length,
-                                                        itemBuilder:
-                                                            (context,
-                                                                index,) {
-                                                          CategoryModel?
-                                                              item4;
+                                                            .children!.length,
+                                                        itemBuilder: (
+                                                          context,
+                                                          index,
+                                                        ) {
+                                                          CategoryModel? item4;
                                                           item4 = item3!
                                                                   .children!
                                                                   .isEmpty
                                                               ? null
                                                               : item3.children![
                                                                   index];
-                                                          return item4 ==
-                                                                  null
+                                                          return item4 == null
                                                               ? Container()
                                                               : Column(
                                                                   children: [
                                                                     InkWell(
                                                                       onTap:
                                                                           () {
-                                                                        setState(() {});
+                                                                        setState(
+                                                                            () {});
                                                                         selectedCatName =
                                                                             item4!.name;
                                                                         selectedCatID =
@@ -3173,18 +3267,23 @@ class _EditProductState extends State<EditProduct>
                                                                           Row(
                                                                         children: [
                                                                           const SizedBox(
-                                                                            width: 10,
+                                                                            width:
+                                                                                10,
                                                                           ),
                                                                           const Icon(
                                                                             Icons.subdirectory_arrow_right_outlined,
-                                                                            color: primary,
-                                                                            size: 20,
+                                                                            color:
+                                                                                primary,
+                                                                            size:
+                                                                                20,
                                                                           ),
                                                                           const SizedBox(
-                                                                            width: 5,
+                                                                            width:
+                                                                                5,
                                                                           ),
                                                                           Expanded(
-                                                                            child: Text(
+                                                                            child:
+                                                                                Text(
                                                                               item4.name!,
                                                                             ),
                                                                           ),
@@ -3192,22 +3291,32 @@ class _EditProductState extends State<EditProduct>
                                                                       ),
                                                                     ),
                                                                     Container(
-                                                                      child:
-                                                                          ListView.builder(
+                                                                      child: ListView
+                                                                          .builder(
                                                                         shrinkWrap:
                                                                             true,
-                                                                        padding: const EdgeInsetsDirectional.only(
-                                                                            bottom: 5,
-                                                                            start: 10,
-                                                                            end: 10,),
+                                                                        padding:
+                                                                            const EdgeInsetsDirectional.only(
+                                                                          bottom:
+                                                                              5,
+                                                                          start:
+                                                                              10,
+                                                                          end:
+                                                                              10,
+                                                                        ),
                                                                         physics:
                                                                             const NeverScrollableScrollPhysics(),
-                                                                        itemCount:
-                                                                            item4.children!.length,
+                                                                        itemCount: item4
+                                                                            .children!
+                                                                            .length,
                                                                         itemBuilder:
-                                                                            (context, index) {
-                                                                          CategoryModel? item5;
-                                                                          item5 = item4!.children!.isEmpty ? null : item4.children![index];
+                                                                            (context,
+                                                                                index) {
+                                                                          CategoryModel?
+                                                                              item5;
+                                                                          item5 = item4!.children!.isEmpty
+                                                                              ? null
+                                                                              : item4.children![index];
                                                                           return item5 == null
                                                                               ? Container()
                                                                               : Column(
@@ -3454,15 +3563,18 @@ class _EditProductState extends State<EditProduct>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    if (tillwhichstatus != null) Text(
-                            tillwhichstatus == 'received'
-                                ? getTranslated(context, RECEIVED_LBL)!
-                                : tillwhichstatus == 'processed'
-                                    ? getTranslated(context, PROCESSED_LBL)!
-                                    : getTranslated(context, SHIPED_LBL)!,
-                          ) else Text(
-                            getTranslated(context, TillwhichstatusText)!,
-                          ),
+                    if (tillwhichstatus != null)
+                      Text(
+                        tillwhichstatus == 'received'
+                            ? getTranslated(context, RECEIVED_LBL)!
+                            : tillwhichstatus == 'processed'
+                                ? getTranslated(context, PROCESSED_LBL)!
+                                : getTranslated(context, SHIPED_LBL)!,
+                      )
+                    else
+                      Text(
+                        getTranslated(context, TillwhichstatusText)!,
+                      ),
                   ],
                 ),
               ),
@@ -3516,7 +3628,11 @@ class _EditProductState extends State<EditProduct>
                               width: double.maxFinite,
                               child: Padding(
                                 padding: const EdgeInsets.fromLTRB(
-                                    20.0, 20.0, 20.0, 20.0,),
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                ),
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -3542,7 +3658,11 @@ class _EditProductState extends State<EditProduct>
                               width: double.maxFinite,
                               child: Padding(
                                 padding: const EdgeInsets.fromLTRB(
-                                    20.0, 20.0, 20.0, 20.0,),
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                ),
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -3568,7 +3688,11 @@ class _EditProductState extends State<EditProduct>
                               width: double.maxFinite,
                               child: Padding(
                                 padding: const EdgeInsets.fromLTRB(
-                                    20.0, 20.0, 20.0, 20.0,),
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                ),
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -3895,13 +4019,16 @@ class _EditProductState extends State<EditProduct>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    if (selectedTypeOfVideo != null) Text(
-                            selectedTypeOfVideo == 'vimeo'
-                                ? getTranslated(context, Vimeo)!
-                                : getTranslated(context, Youtube)!,
-                          ) else Text(
-                            getTranslated(context, SelectVideoTypeText)!,
-                          ),
+                    if (selectedTypeOfVideo != null)
+                      Text(
+                        selectedTypeOfVideo == 'vimeo'
+                            ? getTranslated(context, Vimeo)!
+                            : getTranslated(context, Youtube)!,
+                      )
+                    else
+                      Text(
+                        getTranslated(context, SelectVideoTypeText)!,
+                      ),
                   ],
                 ),
               ),
@@ -3971,7 +4098,11 @@ class _EditProductState extends State<EditProduct>
                               width: double.maxFinite,
                               child: Padding(
                                 padding: const EdgeInsets.fromLTRB(
-                                    20.0, 20.0, 20.0, 20.0,),
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                ),
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -3997,7 +4128,11 @@ class _EditProductState extends State<EditProduct>
                               width: double.maxFinite,
                               child: Padding(
                                 padding: const EdgeInsets.fromLTRB(
-                                    20.0, 20.0, 20.0, 20.0,),
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                ),
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -4023,7 +4158,11 @@ class _EditProductState extends State<EditProduct>
                               width: double.maxFinite,
                               child: Padding(
                                 padding: const EdgeInsets.fromLTRB(
-                                    20.0, 20.0, 20.0, 20.0,),
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                ),
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -4049,7 +4188,11 @@ class _EditProductState extends State<EditProduct>
                               width: double.maxFinite,
                               child: Padding(
                                 padding: const EdgeInsets.fromLTRB(
-                                    20.0, 20.0, 20.0, 20.0,),
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                ),
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -4228,470 +4371,570 @@ class _EditProductState extends State<EditProduct>
                     getTranslated(context, AttributesText)!,
                   ),
                 ),
-                if (productType == 'variable_product') TextButton(
-                        style: curSelPos == 2
-                            ? TextButton.styleFrom(
-                                foregroundColor: Colors.white,
-                                backgroundColor: primary,
-                                disabledForegroundColor:
-                                    Colors.grey.withOpacity(0.38),
-                              )
-                            : null,
-                        onPressed: () {
-                          setState(
-                            () {
-                              curSelPos = 2;
-                            },
-                          );
+                if (productType == 'variable_product')
+                  TextButton(
+                    style: curSelPos == 2
+                        ? TextButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            backgroundColor: primary,
+                            disabledForegroundColor:
+                                Colors.grey.withOpacity(0.38),
+                          )
+                        : null,
+                    onPressed: () {
+                      setState(
+                        () {
+                          curSelPos = 2;
                         },
-                        child: Text(
-                          getTranslated(context, VariationsText)!,
-                        ),
-                      ) else Container(),
+                      );
+                    },
+                    child: Text(
+                      getTranslated(context, VariationsText)!,
+                    ),
+                  )
+                else
+                  Container(),
               ],
             ),
-            if (curSelPos == 0) Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child:
-                            Text("${getTranslated(context, TypeOfProduct)!} :"),
+            if (curSelPos == 0)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text("${getTranslated(context, TypeOfProduct)!} :"),
+                  ),
+                  typeSelectionField(),
+                  if (productType == 'simple_product' ||
+                      productType == 'digital_product')
+                    simpleProductPrice()
+                  else
+                    Container(),
+                  if (productType == 'simple_product' ||
+                      productType == 'digital_product')
+                    simpleProductSpecialPrice()
+                  else
+                    Container(),
+                  if (productType == 'digital_product')
+                    downloadAllowed()
+                  else
+                    const SizedBox.shrink(),
+                  if (productType == 'digital_product')
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        "${getTranslated(context, DownloadLinkTypeText)!} :",
                       ),
-                      typeSelectionField(),
-                      if (productType == 'simple_product' ||
-                              productType == 'digital_product') simpleProductPrice() else Container(),
-                      if (productType == 'simple_product' ||
-                              productType == 'digital_product') simpleProductSpecialPrice() else Container(),
-                      if (productType == 'digital_product') downloadAllowed() else const SizedBox.shrink(),
-                      if (productType == 'digital_product') Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                  "${getTranslated(context, DownloadLinkTypeText)!} :",),
-                            ) else const SizedBox.shrink(),
-                      if (productType == 'digital_product') Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: InkWell(
-                                child: Container(
-                                  padding: const EdgeInsets.only(
-                                    top: 5,
-                                    bottom: 5,
-                                    left: 5,
-                                    right: 5,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(
-                                      color: lightBlack,
-                                    ),
-                                  ),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Expanded(
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            if (downloadLinkType != null) Text(
-                                                    downloadLinkType == 'None'
-                                                        ? getTranslated(
-                                                            context, None,)!
-                                                        : downloadLinkType ==
-                                                                'self_hosted'
-                                                            ? getTranslated(
-                                                                context,
-                                                                SelfHostedText,)!
-                                                            : getTranslated(
-                                                                context,
-                                                                AddLinkText,)!,
-                                                  ) else Text(
-                                                    getTranslated(
-                                                        context, None,)!,
-                                                  ),
-                                          ],
-                                        ),
-                                      ),
-                                      const Icon(
-                                        Icons.arrow_drop_down,
-                                        color: primary,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                onTap: () {
-                                  FocusScope.of(context)
-                                      .requestFocus(FocusNode());
-                                  downloadLinkTypeDialog();
-                                },
-                              ),
-                            ) else const SizedBox.shrink(),
-                      if (downloadLinkType == 'self_hosted' &&
-                              productType == 'digital_product') Column(
-                              children: [fileUpload(), selectedFileShow()],
-                            ) else const SizedBox.shrink(),
-                      if (downloadLinkType == 'add_link' &&
-                              productType == 'digital_product') digitalProductLink() else const SizedBox.shrink(),
-                      if (productType != 'digital_product') CheckboxListTile(
-                              title: Text(
-                                getTranslated(
-                                    context, EnableStockManagementText,)!,
-                              ),
-                              value: _isStockSelected ?? false,
-                              onChanged: (bool? value) {
-                                setState(() {
-                                  _isStockSelected = value;
-                                });
-                              },
-                            ) else const SizedBox.shrink(),
-                      if (_isStockSelected != null &&
-                              _isStockSelected == true &&
-                              productType == 'simple_product') simpleProductSKU() else Container(),
-                      if (productType == 'digital_product') Align(
-                              alignment: Alignment.bottomRight,
-                              child: SimBtn(
-                                title:
-                                    getTranslated(context, SaveSettingsText),
-                                size: MediaQuery.of(context).size.width * 0.5,
-                                onBtnSelected: () {
-                                  if (digitalProductPriceController
-                                      .text.isEmpty) {
-                                    setsnackbar(
-                                      getTranslated(context,
-                                          PleaseenterproductpriceText,)!,
-                                      context,
-                                    );
-                                  } else if (digitalProductSpecialPriceController
-                                      .text.isEmpty) {
-                                    setState(
-                                      () {
-                                        setsnackbar(
-                                          getTranslated(context,
-                                              PleaseenterproductspecialpriceText,)!,
-                                          context,
-                                        );
-                                      },
-                                    );
-                                  } else if (int.parse(digitalproductPrice!) <
-                                      int.parse(digitalproductSpecialPrice!)) {
-                                    setsnackbar(
-                                      getTranslated(
-                                          context, SpecialpricemustbelessText,)!,
-                                      context,
-                                    );
-                                  } else if (downloadLinkType == null ||
-                                      downloadLinkType == 'None') {
-                                    setsnackbar(
-                                      getTranslated(
-                                          context, SelDownloadLinkTypeText,)!,
-                                      context,
-                                    );
-                                  } else if (downloadLinkType ==
-                                          'self_hosted' &&
-                                      uploadFileName == '') {
-                                    setsnackbar(
-                                      getTranslated(
-                                          context, AddDigitalProductFileText,)!,
-                                      context,
-                                    );
-                                  } else if (downloadLinkType == 'add_link' &&
-                                      (digitalLink == null ||
-                                          digitalLink!.isEmpty)) {
-                                    setsnackbar(
-                                      getTranslated(
-                                          context, AddDigitalProductlinkText,)!,
-                                      context,
-                                    );
-                                  } else {
-                                    setState(
-                                      () {
-                                        digitalProductSaveSettings = true;
-                                        setsnackbar(
-                                          getTranslated(context,
-                                              SettingsavedsuccessfullyText,)!,
-                                          context,
-                                        );
-                                      },
-                                    );
-                                  }
-                                },
-                              ),
-                            ) else Container(),
-                      if (productType == 'simple_product') Align(
-                              alignment: Alignment.bottomRight,
-                              child: SimBtn(
-                                title:
-                                    getTranslated(context, SaveSettingsText),
-                                size: MediaQuery.of(context).size.width * 0.5,
-                                onBtnSelected: () {
-                                  if (simpleProductPriceController
-                                      .text.isEmpty) {
-                                    setsnackbar(
-                                        getTranslated(context,
-                                            PleaseenterproductpriceText,)!,
-                                        context,);
-                                  } else if (simpleProductSpecialPriceController
-                                      .text.isEmpty) {
-                                    setState(
-                                      () {
-                                        simpleProductSaveSettings = true;
-                                        setsnackbar(
-                                            getTranslated(context,
-                                                SettingsavedsuccessfullyText,)!,
-                                            context,);
-                                      },
-                                    );
-                                  } else if (int.parse(simpleproductPrice!) <
-                                      int.parse(simpleproductSpecialPrice!)) {
-                                    setsnackbar(
-                                        getTranslated(context,
-                                            SpecialpricemustbelessText,)!,
-                                        context,);
-                                  } else {
-                                    setState(
-                                      () {
-                                        simpleProductSaveSettings = true;
-                                        setsnackbar(
-                                            getTranslated(context,
-                                                SettingsavedsuccessfullyText,)!,
-                                            context,);
-                                      },
-                                    );
-                                  }
-                                },
-                              ),
-                            ) else Container(),
-                      if (_isStockSelected != null &&
-                              _isStockSelected == true &&
-                              productType == 'variable_product') variableProductStockManagementType() else Container(),
-                      if (productType == 'variable_product' &&
-                              variantStockLevelType == "product_level" &&
-                              _isStockSelected != null &&
-                              _isStockSelected == true) Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                variableProductSKU(),
-                                variantProductTotalstock(),
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                    "${getTranslated(context, StockStatusText)!} :",
-                                  ),
-                                ),
-                                productStockStatusSelect(),
-                              ],
-                            ) else Container(),
-                      if (productType == 'variable_product' &&
-                              variantStockLevelType == "product_level") SimBtn(
-                              title: getTranslated(context, SaveSettingsText),
-                              size: MediaQuery.of(context).size.width * 0.5,
-                              onBtnSelected: () {
-                                if (_isStockSelected != null &&
-                                    _isStockSelected == true &&
-                                    (variountProductTotalStock.text.isEmpty ||
-                                        stockStatus.isEmpty)) {
-                                  setsnackbar(
-                                      getTranslated(
-                                          context, PleaseenteralldetailsText,)!,
-                                      context,);
-                                } else {
-                                  setState(
-                                    () {
-                                      variantProductProductLevelSaveSettings =
-                                          true;
-                                      setsnackbar(
-                                          getTranslated(context,
-                                              SettingsavedsuccessfullyText,)!,
-                                          context,);
-                                    },
-                                  );
-                                }
-                              },
-                            ) else Container(),
-                      if (productType == 'variable_product' &&
-                              variantStockLevelType == "variable_level") SimBtn(
-                              title: getTranslated(context, SaveSettingsText),
-                              size: MediaQuery.of(context).size.width * 0.5,
-                              onBtnSelected: () {
-                                setState(
-                                  () {
-                                    variantProductVariableLevelSaveSettings =
-                                        true;
-                                    setsnackbar(
-                                        getTranslated(context,
-                                            SettingsavedsuccessfullyText,)!,
-                                        context,);
-                                  },
-                                );
-                              },
-                            ) else Container(),
-                    ],
-                  ) else Container(),
-            if (curSelPos == 1 &&
-                    (simpleProductSaveSettings ||
-                        variantProductVariableLevelSaveSettings ||
-                        variantProductProductLevelSaveSettings ||
-                        digitalProductSaveSettings)) Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Container(
-                                child: Text(
-                                  getTranslated(context, AttributesText)!,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
+                    )
+                  else
+                    const SizedBox.shrink(),
+                  if (productType == 'digital_product')
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: InkWell(
+                        child: Container(
+                          padding: const EdgeInsets.only(
+                            top: 5,
+                            bottom: 5,
+                            left: 5,
+                            right: 5,
+                          ),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: lightBlack,
                             ),
                           ),
-                          Column(
-                            mainAxisSize: MainAxisSize.min,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              OutlinedButton(
-                                onPressed: () {
-                                  if (attributeIndiacator ==
-                                      _attrController.length) {
-                                    setState(() {
-                                      _attrController.add(
-                                        TextEditingController(),
-                                      );
-                                      variationBoolList.add(false);
-                                    });
-                                  } else {
-                                    setsnackbar(
-                                        getTranslated(context,
-                                            filltheboxthenaddanotherText,)!,
-                                        context,);
-                                  }
-                                },
-                                child: Text(
-                                  getTranslated(context, AddAttributeText)!,
+                              Expanded(
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    if (downloadLinkType != null)
+                                      Text(
+                                        downloadLinkType == 'None'
+                                            ? getTranslated(
+                                                context,
+                                                None,
+                                              )!
+                                            : downloadLinkType == 'self_hosted'
+                                                ? getTranslated(
+                                                    context,
+                                                    SelfHostedText,
+                                                  )!
+                                                : getTranslated(
+                                                    context,
+                                                    AddLinkText,
+                                                  )!,
+                                      )
+                                    else
+                                      Text(
+                                        getTranslated(
+                                          context,
+                                          None,
+                                        )!,
+                                      ),
+                                  ],
                                 ),
                               ),
-                              OutlinedButton(
-                                onPressed: () {
-                                  tempAttList.clear();
-                                  final List<String> attributeIds = [];
-                                  for (var i = 0;
-                                      i < variationBoolList.length;
-                                      i++) {
-                                    if (variationBoolList[i]) {
-                                      final attributes = attributesList
-                                          .where((element) =>
-                                              element.name ==
-                                              _attrController[i].text,)
-                                          .toList();
-                                      if (attributes.isNotEmpty) {
-                                        attributeIds.add(attributes.first.id!);
-                                      }
-                                    }
-                                  }
-                                  setState(
-                                    () {
-                                      resultAttr = [];
-                                      resultID = [];
-                                      finalAttList = [];
-                                      for (final key in attributeIds) {
-                                        tempAttList
-                                            .add(selectedAttributeValues[key]!);
-                                      }
-                                      for (int i = 0;
-                                          i < tempAttList.length;
-                                          i++) {
-                                        finalAttList.add(tempAttList[i]);
-                                      }
-                                      if (finalAttList.isNotEmpty) {
-                                        max = finalAttList.length - 1;
-                                        getCombination([], [], 0);
-                                        row = 1;
-                                        col = max + 1;
-                                        for (int i = 0; i < col; i++) {
-                                          final int singleRow =
-                                              finalAttList[i].length;
-                                          row = row * singleRow;
-                                        }
-                                      }
-                                      setsnackbar(
-                                          getTranslated(context,
-                                              AttributessavedsuccessfullyText,)!,
-                                          context,);
-                                    },
-                                  );
-                                },
-                                child: Text(
-                                  getTranslated(context, SaveAttributeText)!,
-                                ),
+                              const Icon(
+                                Icons.arrow_drop_down,
+                                color: primary,
                               ),
                             ],
                           ),
-                        ],
+                        ),
+                        onTap: () {
+                          FocusScope.of(context).requestFocus(FocusNode());
+                          downloadLinkTypeDialog();
+                        },
                       ),
-                      if (productType == 'variable_product') Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                getTranslated(context, selectcheckboxText)!,
-                              ),
-                            ) else Container(),
-                      for (int i = 0; i < _attrController.length; i++)
-                        addAttribute(i),
-                    ],
-                  ) else Container(),
-            if (curSelPos == 2 && variationList.isNotEmpty) ListView.builder(
-                    itemCount: variationList.length,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemBuilder: (context, i) {
-                      return ExpansionTile(
-                        title: Row(
-                          children: [
-                            for (int j = 0; j < col; j++)
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0,),
-                                  child: Text(
-                                    variationList[i].attr_name!.split(',')[j],
-                                  ),
-                                ),
-                              ),
-                            InkWell(
-                              child: const Padding(
-                                padding: EdgeInsets.all(5.0),
-                                child: Icon(
-                                  Icons.close,
-                                ),
-                              ),
-                              onTap: () {
-                                setState(
-                                  () {
-                                    variationList.removeAt(i);
-                                    for (int i = 0;
-                                        i < variationList.length;
-                                        i++) {
-                                      row = row - 1;
-                                    }
-                                  },
+                    )
+                  else
+                    const SizedBox.shrink(),
+                  if (downloadLinkType == 'self_hosted' &&
+                      productType == 'digital_product')
+                    Column(
+                      children: [fileUpload(), selectedFileShow()],
+                    )
+                  else
+                    const SizedBox.shrink(),
+                  if (downloadLinkType == 'add_link' &&
+                      productType == 'digital_product')
+                    digitalProductLink()
+                  else
+                    const SizedBox.shrink(),
+                  if (productType != 'digital_product')
+                    CheckboxListTile(
+                      title: Text(
+                        getTranslated(
+                          context,
+                          EnableStockManagementText,
+                        )!,
+                      ),
+                      value: _isStockSelected ?? false,
+                      onChanged: (bool? value) {
+                        setState(() {
+                          _isStockSelected = value;
+                        });
+                      },
+                    )
+                  else
+                    const SizedBox.shrink(),
+                  if (_isStockSelected != null &&
+                      _isStockSelected == true &&
+                      productType == 'simple_product')
+                    simpleProductSKU()
+                  else
+                    Container(),
+                  if (productType == 'digital_product')
+                    Align(
+                      alignment: Alignment.bottomRight,
+                      child: SimBtn(
+                        title: getTranslated(context, SaveSettingsText),
+                        size: MediaQuery.of(context).size.width * 0.5,
+                        onBtnSelected: () {
+                          if (digitalProductPriceController.text.isEmpty) {
+                            setsnackbar(
+                              getTranslated(
+                                context,
+                                PleaseenterproductpriceText,
+                              )!,
+                              context,
+                            );
+                          } else if (digitalProductSpecialPriceController
+                              .text.isEmpty) {
+                            setState(
+                              () {
+                                setsnackbar(
+                                  getTranslated(
+                                    context,
+                                    PleaseenterproductspecialpriceText,
+                                  )!,
+                                  context,
                                 );
                               },
-                            ),
-                          ],
+                            );
+                          } else if (int.parse(digitalproductPrice!) <
+                              int.parse(digitalproductSpecialPrice!)) {
+                            setsnackbar(
+                              getTranslated(
+                                context,
+                                SpecialpricemustbelessText,
+                              )!,
+                              context,
+                            );
+                          } else if (downloadLinkType == null ||
+                              downloadLinkType == 'None') {
+                            setsnackbar(
+                              getTranslated(
+                                context,
+                                SelDownloadLinkTypeText,
+                              )!,
+                              context,
+                            );
+                          } else if (downloadLinkType == 'self_hosted' &&
+                              uploadFileName == '') {
+                            setsnackbar(
+                              getTranslated(
+                                context,
+                                AddDigitalProductFileText,
+                              )!,
+                              context,
+                            );
+                          } else if (downloadLinkType == 'add_link' &&
+                              (digitalLink == null || digitalLink!.isEmpty)) {
+                            setsnackbar(
+                              getTranslated(
+                                context,
+                                AddDigitalProductlinkText,
+                              )!,
+                              context,
+                            );
+                          } else {
+                            setState(
+                              () {
+                                digitalProductSaveSettings = true;
+                                setsnackbar(
+                                  getTranslated(
+                                    context,
+                                    SettingsavedsuccessfullyText,
+                                  )!,
+                                  context,
+                                );
+                              },
+                            );
+                          }
+                        },
+                      ),
+                    )
+                  else
+                    Container(),
+                  if (productType == 'simple_product')
+                    Align(
+                      alignment: Alignment.bottomRight,
+                      child: SimBtn(
+                        title: getTranslated(context, SaveSettingsText),
+                        size: MediaQuery.of(context).size.width * 0.5,
+                        onBtnSelected: () {
+                          if (simpleProductPriceController.text.isEmpty) {
+                            setsnackbar(
+                              getTranslated(
+                                context,
+                                PleaseenterproductpriceText,
+                              )!,
+                              context,
+                            );
+                          } else if (simpleProductSpecialPriceController
+                              .text.isEmpty) {
+                            setState(
+                              () {
+                                simpleProductSaveSettings = true;
+                                setsnackbar(
+                                  getTranslated(
+                                    context,
+                                    SettingsavedsuccessfullyText,
+                                  )!,
+                                  context,
+                                );
+                              },
+                            );
+                          } else if (int.parse(simpleproductPrice!) <
+                              int.parse(simpleproductSpecialPrice!)) {
+                            setsnackbar(
+                              getTranslated(
+                                context,
+                                SpecialpricemustbelessText,
+                              )!,
+                              context,
+                            );
+                          } else {
+                            setState(
+                              () {
+                                simpleProductSaveSettings = true;
+                                setsnackbar(
+                                  getTranslated(
+                                    context,
+                                    SettingsavedsuccessfullyText,
+                                  )!,
+                                  context,
+                                );
+                              },
+                            );
+                          }
+                        },
+                      ),
+                    )
+                  else
+                    Container(),
+                  if (_isStockSelected != null &&
+                      _isStockSelected == true &&
+                      productType == 'variable_product')
+                    variableProductStockManagementType()
+                  else
+                    Container(),
+                  if (productType == 'variable_product' &&
+                      variantStockLevelType == "product_level" &&
+                      _isStockSelected != null &&
+                      _isStockSelected == true)
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        variableProductSKU(),
+                        variantProductTotalstock(),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            "${getTranslated(context, StockStatusText)!} :",
+                          ),
                         ),
-                        children: <Widget>[
-                          Column(
-                            children: _buildExpandableContent(i),
+                        productStockStatusSelect(),
+                      ],
+                    )
+                  else
+                    Container(),
+                  if (productType == 'variable_product' &&
+                      variantStockLevelType == "product_level")
+                    SimBtn(
+                      title: getTranslated(context, SaveSettingsText),
+                      size: MediaQuery.of(context).size.width * 0.5,
+                      onBtnSelected: () {
+                        if (_isStockSelected != null &&
+                            _isStockSelected == true &&
+                            (variountProductTotalStock.text.isEmpty ||
+                                stockStatus.isEmpty)) {
+                          setsnackbar(
+                            getTranslated(
+                              context,
+                              PleaseenteralldetailsText,
+                            )!,
+                            context,
+                          );
+                        } else {
+                          setState(
+                            () {
+                              variantProductProductLevelSaveSettings = true;
+                              setsnackbar(
+                                getTranslated(
+                                  context,
+                                  SettingsavedsuccessfullyText,
+                                )!,
+                                context,
+                              );
+                            },
+                          );
+                        }
+                      },
+                    )
+                  else
+                    Container(),
+                  if (productType == 'variable_product' &&
+                      variantStockLevelType == "variable_level")
+                    SimBtn(
+                      title: getTranslated(context, SaveSettingsText),
+                      size: MediaQuery.of(context).size.width * 0.5,
+                      onBtnSelected: () {
+                        setState(
+                          () {
+                            variantProductVariableLevelSaveSettings = true;
+                            setsnackbar(
+                              getTranslated(
+                                context,
+                                SettingsavedsuccessfullyText,
+                              )!,
+                              context,
+                            );
+                          },
+                        );
+                      },
+                    )
+                  else
+                    Container(),
+                ],
+              )
+            else
+              Container(),
+            if (curSelPos == 1 &&
+                (simpleProductSaveSettings ||
+                    variantProductVariableLevelSaveSettings ||
+                    variantProductProductLevelSaveSettings ||
+                    digitalProductSaveSettings))
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Container(
+                            child: Text(
+                              getTranslated(context, AttributesText)!,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          OutlinedButton(
+                            onPressed: () {
+                              if (attributeIndiacator ==
+                                  _attrController.length) {
+                                setState(() {
+                                  _attrController.add(
+                                    TextEditingController(),
+                                  );
+                                  variationBoolList.add(false);
+                                });
+                              } else {
+                                setsnackbar(
+                                  getTranslated(
+                                    context,
+                                    filltheboxthenaddanotherText,
+                                  )!,
+                                  context,
+                                );
+                              }
+                            },
+                            child: Text(
+                              getTranslated(context, AddAttributeText)!,
+                            ),
+                          ),
+                          OutlinedButton(
+                            onPressed: () {
+                              tempAttList.clear();
+                              final List<String> attributeIds = [];
+                              for (var i = 0;
+                                  i < variationBoolList.length;
+                                  i++) {
+                                if (variationBoolList[i]) {
+                                  final attributes = attributesList
+                                      .where(
+                                        (element) =>
+                                            element.name ==
+                                            _attrController[i].text,
+                                      )
+                                      .toList();
+                                  if (attributes.isNotEmpty) {
+                                    attributeIds.add(attributes.first.id!);
+                                  }
+                                }
+                              }
+                              setState(
+                                () {
+                                  resultAttr = [];
+                                  resultID = [];
+                                  finalAttList = [];
+                                  for (final key in attributeIds) {
+                                    tempAttList
+                                        .add(selectedAttributeValues[key]!);
+                                  }
+                                  for (int i = 0; i < tempAttList.length; i++) {
+                                    finalAttList.add(tempAttList[i]);
+                                  }
+                                  if (finalAttList.isNotEmpty) {
+                                    max = finalAttList.length - 1;
+                                    getCombination([], [], 0);
+                                    row = 1;
+                                    col = max + 1;
+                                    for (int i = 0; i < col; i++) {
+                                      final int singleRow =
+                                          finalAttList[i].length;
+                                      row = row * singleRow;
+                                    }
+                                  }
+                                  setsnackbar(
+                                    getTranslated(
+                                      context,
+                                      AttributessavedsuccessfullyText,
+                                    )!,
+                                    context,
+                                  );
+                                },
+                              );
+                            },
+                            child: Text(
+                              getTranslated(context, SaveAttributeText)!,
+                            ),
                           ),
                         ],
-                      );
-                    },
-                  ) else Container(),
+                      ),
+                    ],
+                  ),
+                  if (productType == 'variable_product')
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        getTranslated(context, selectcheckboxText)!,
+                      ),
+                    )
+                  else
+                    Container(),
+                  for (int i = 0; i < _attrController.length; i++)
+                    addAttribute(i),
+                ],
+              )
+            else
+              Container(),
+            if (curSelPos == 2 && variationList.isNotEmpty)
+              ListView.builder(
+                itemCount: variationList.length,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemBuilder: (context, i) {
+                  return ExpansionTile(
+                    title: Row(
+                      children: [
+                        for (int j = 0; j < col; j++)
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8.0,
+                              ),
+                              child: Text(
+                                variationList[i].attr_name!.split(',')[j],
+                              ),
+                            ),
+                          ),
+                        InkWell(
+                          child: const Padding(
+                            padding: EdgeInsets.all(5.0),
+                            child: Icon(
+                              Icons.close,
+                            ),
+                          ),
+                          onTap: () {
+                            setState(
+                              () {
+                                variationList.removeAt(i);
+                                for (int i = 0; i < variationList.length; i++) {
+                                  row = row - 1;
+                                }
+                              },
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                    children: <Widget>[
+                      Column(
+                        children: _buildExpandableContent(i),
+                      ),
+                    ],
+                  );
+                },
+              )
+            else
+              Container(),
           ],
         ),
       ),
@@ -4863,7 +5106,11 @@ class _EditProductState extends State<EditProduct>
                               width: double.maxFinite,
                               child: Padding(
                                 padding: const EdgeInsets.fromLTRB(
-                                    20.0, 20.0, 20.0, 20.0,),
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                ),
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -4889,7 +5136,11 @@ class _EditProductState extends State<EditProduct>
                               width: double.maxFinite,
                               child: Padding(
                                 padding: const EdgeInsets.fromLTRB(
-                                    20.0, 20.0, 20.0, 20.0,),
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                ),
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -4915,7 +5166,11 @@ class _EditProductState extends State<EditProduct>
                               width: double.maxFinite,
                               child: Padding(
                                 padding: const EdgeInsets.fromLTRB(
-                                    20.0, 20.0, 20.0, 20.0,),
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                ),
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -5110,8 +5365,11 @@ class _EditProductState extends State<EditProduct>
     );
   }
 
-  addValAttribute(List<AttributeValueModel> selected,
-      List<AttributeValueModel> searchRange, String attributeId,) {
+  addValAttribute(
+    List<AttributeValueModel> selected,
+    List<AttributeValueModel> searchRange,
+    String attributeId,
+  ) {
     showModalBottomSheet<List<AttributeValueModel>>(
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
@@ -5153,10 +5411,11 @@ class _EditProductState extends State<EditProduct>
               ),
               SliverGrid(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    childAspectRatio: 2,
-                    mainAxisSpacing: 5.0,
-                    crossAxisSpacing: 5.0,),
+                  crossAxisCount: 3,
+                  childAspectRatio: 2,
+                  mainAxisSpacing: 5.0,
+                  crossAxisSpacing: 5.0,
+                ),
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
                     return filterChipWidget(
@@ -5258,8 +5517,11 @@ class _EditProductState extends State<EditProduct>
                 final attributeValues = attributesValueList
                     .where((element) => element.attributeId == attributeId)
                     .toList();
-                addValAttribute(selectedAttributeValues[attributeId]!,
-                    attributeValues, attributeId!,);
+                addValAttribute(
+                  selectedAttributeValues[attributeId]!,
+                  attributeValues,
+                  attributeId!,
+                );
               },
               child: Container(
                 width: deviceWidth,
@@ -5343,13 +5605,16 @@ class _EditProductState extends State<EditProduct>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    if (stockStatus != '') Text(
-                            stockStatus == '1'
-                                ? getTranslated(context, InStockText)!
-                                : getTranslated(context, OutofStock)!,
-                          ) else Text(
-                            getTranslated(context, SelectStockStatusText)!,
-                          ),
+                    if (stockStatus != '')
+                      Text(
+                        stockStatus == '1'
+                            ? getTranslated(context, InStockText)!
+                            : getTranslated(context, OutofStock)!,
+                      )
+                    else
+                      Text(
+                        getTranslated(context, SelectStockStatusText)!,
+                      ),
                   ],
                 ),
               ),
@@ -5469,7 +5734,11 @@ class _EditProductState extends State<EditProduct>
                               width: double.maxFinite,
                               child: Padding(
                                 padding: const EdgeInsets.fromLTRB(
-                                    20.0, 20.0, 20.0, 20.0,),
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                ),
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -5499,7 +5768,11 @@ class _EditProductState extends State<EditProduct>
                               width: double.maxFinite,
                               child: Padding(
                                 padding: const EdgeInsets.fromLTRB(
-                                    20.0, 20.0, 20.0, 20.0,),
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                ),
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -5977,13 +6250,16 @@ class _EditProductState extends State<EditProduct>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    if (simpleproductStockStatus != null) Text(
-                            simpleproductStockStatus == '1'
-                                ? getTranslated(context, InStockText)!
-                                : getTranslated(context, OutofStock)!,
-                          ) else Text(
-                            getTranslated(context, SelectStockStatusText)!,
-                          ),
+                    if (simpleproductStockStatus != null)
+                      Text(
+                        simpleproductStockStatus == '1'
+                            ? getTranslated(context, InStockText)!
+                            : getTranslated(context, OutofStock)!,
+                      )
+                    else
+                      Text(
+                        getTranslated(context, SelectStockStatusText)!,
+                      ),
                   ],
                 ),
               ),
@@ -6053,7 +6329,11 @@ class _EditProductState extends State<EditProduct>
                               width: double.maxFinite,
                               child: Padding(
                                 padding: const EdgeInsets.fromLTRB(
-                                    20.0, 20.0, 20.0, 20.0,),
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                ),
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -6079,7 +6359,11 @@ class _EditProductState extends State<EditProduct>
                               width: double.maxFinite,
                               child: Padding(
                                 padding: const EdgeInsets.fromLTRB(
-                                    20.0, 20.0, 20.0, 20.0,),
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                ),
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -6190,13 +6474,16 @@ class _EditProductState extends State<EditProduct>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    if (productType != null) Text(
-                            productType == 'simple_product'
-                                ? getTranslated(context, SimpleProductText)!
-                                : getTranslated(context, VariableProductText)!,
-                          ) else Text(
-                            getTranslated(context, SelectTypeText)!,
-                          ),
+                    if (productType != null)
+                      Text(
+                        productType == 'simple_product'
+                            ? getTranslated(context, SimpleProductText)!
+                            : getTranslated(context, VariableProductText)!,
+                      )
+                    else
+                      Text(
+                        getTranslated(context, SelectTypeText)!,
+                      ),
                   ],
                 ),
               ),
@@ -6274,14 +6561,20 @@ class _EditProductState extends State<EditProduct>
                               width: double.maxFinite,
                               child: Padding(
                                 padding: const EdgeInsets.fromLTRB(
-                                    20.0, 20.0, 20.0, 20.0,),
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                ),
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
                                       getTranslated(
-                                          context, SimpleProductText,)!,
+                                        context,
+                                        SimpleProductText,
+                                      )!,
                                     ),
                                   ],
                                 ),
@@ -6309,14 +6602,20 @@ class _EditProductState extends State<EditProduct>
                               width: double.maxFinite,
                               child: Padding(
                                 padding: const EdgeInsets.fromLTRB(
-                                    20.0, 20.0, 20.0, 20.0,),
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                ),
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
                                       getTranslated(
-                                          context, VariableProductText,)!,
+                                        context,
+                                        VariableProductText,
+                                      )!,
                                     ),
                                   ],
                                 ),
@@ -6372,21 +6671,28 @@ class _EditProductState extends State<EditProduct>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    if (variantStockLevelType != null) Expanded(
-                            child: Text(
-                              variantStockLevelType == 'product_level'
-                                  ? getTranslated(
-                                      context, ProductLevelStockText,)!
-                                  : getTranslated(
-                                      context, VariantLevelStockText,)!,
-                              overflow: TextOverflow.ellipsis,
-                              softWrap: true,
-                            ),
-                          ) else Expanded(
-                            child: Text(
-                              getTranslated(context, SelectStockStatusText)!,
-                            ),
-                          ),
+                    if (variantStockLevelType != null)
+                      Expanded(
+                        child: Text(
+                          variantStockLevelType == 'product_level'
+                              ? getTranslated(
+                                  context,
+                                  ProductLevelStockText,
+                                )!
+                              : getTranslated(
+                                  context,
+                                  VariantLevelStockText,
+                                )!,
+                          overflow: TextOverflow.ellipsis,
+                          softWrap: true,
+                        ),
+                      )
+                    else
+                      Expanded(
+                        child: Text(
+                          getTranslated(context, SelectStockStatusText)!,
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -6456,7 +6762,11 @@ class _EditProductState extends State<EditProduct>
                               width: double.maxFinite,
                               child: Padding(
                                 padding: const EdgeInsets.fromLTRB(
-                                    20.0, 20.0, 20.0, 20.0,),
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                ),
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -6464,7 +6774,9 @@ class _EditProductState extends State<EditProduct>
                                     Expanded(
                                       child: Text(
                                         getTranslated(
-                                            context, ProductLevelStockText,)!,
+                                          context,
+                                          ProductLevelStockText,
+                                        )!,
                                         maxLines: 2,
                                         overflow: TextOverflow.ellipsis,
                                       ),
@@ -6487,7 +6799,11 @@ class _EditProductState extends State<EditProduct>
                               width: double.maxFinite,
                               child: Padding(
                                 padding: const EdgeInsets.fromLTRB(
-                                    20.0, 20.0, 20.0, 20.0,),
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                  20.0,
+                                ),
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -6495,7 +6811,9 @@ class _EditProductState extends State<EditProduct>
                                     Expanded(
                                       child: Text(
                                         getTranslated(
-                                            context, VariantLevelStockText,)!,
+                                          context,
+                                          VariantLevelStockText,
+                                        )!,
                                         maxLines: 2,
                                         overflow: TextOverflow.ellipsis,
                                       ),
@@ -6577,24 +6895,27 @@ class _EditProductState extends State<EditProduct>
           const SizedBox(
             height: 05,
           ),
-          if (description == "" || description == null) Container() else Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    border: Border.all(
-                      color: primary,
-                    ),
-                  ),
-                  width: deviceWidth,
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                      left: 8,
-                      right: 8,
-                    ),
-                    child: Html(
-                      data: description ?? "",
-                    ),
-                  ),
+          if (description == "" || description == null)
+            Container()
+          else
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                border: Border.all(
+                  color: primary,
                 ),
+              ),
+              width: deviceWidth,
+              child: Padding(
+                padding: const EdgeInsets.only(
+                  left: 8,
+                  right: 8,
+                ),
+                child: Html(
+                  data: description ?? "",
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -6837,32 +7158,33 @@ class _EditProductState extends State<EditProduct>
               ),
             ),
             Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: InkWell(
-                  child: Container(
-                    width: double.maxFinite,
-                    padding: const EdgeInsets.only(
-                      top: 5,
-                      bottom: 5,
-                      left: 5,
-                      right: 5,
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        color: lightBlack,
-                      ),
-                    ),
-                    child: selectedBrandName == null || selectedBrandName == ""
-                        ? Text(
-                            getTranslated(context, SEL_BRAND_LBL)!,
-                          )
-                        : Text(selectedBrandName!),
+              padding: const EdgeInsets.only(top: 8.0),
+              child: InkWell(
+                child: Container(
+                  width: double.maxFinite,
+                  padding: const EdgeInsets.only(
+                    top: 5,
+                    bottom: 5,
+                    left: 5,
+                    right: 5,
                   ),
-                  onTap: () {
-                    brandSelectButtomSheet();
-                  },
-                ),),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: lightBlack,
+                    ),
+                  ),
+                  child: selectedBrandName == null || selectedBrandName == ""
+                      ? Text(
+                          getTranslated(context, SEL_BRAND_LBL)!,
+                        )
+                      : Text(selectedBrandName!),
+                ),
+                onTap: () {
+                  brandSelectButtomSheet();
+                },
+              ),
+            ),
           ],
         ),
       ),
@@ -6874,125 +7196,124 @@ class _EditProductState extends State<EditProduct>
       context: context,
       builder: (BuildContext context) {
         return StatefulBuilder(
-            builder: (BuildContext context, StateSetter setStater) {
-          taxesState = setStater;
-          return ConstrainedBox(
+          builder: (BuildContext context, StateSetter setStater) {
+            taxesState = setStater;
+            return ConstrainedBox(
               constraints: const BoxConstraints(maxHeight: 100.0),
               child: AlertDialog(
-                  scrollable: true,
-                  contentPadding: EdgeInsets.zero,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(5.0),
-                    ),
+                scrollable: true,
+                contentPadding: EdgeInsets.zero,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(5.0),
                   ),
-                  title: Center(
-                    child: Text(
-                      getTranslated(context, SEL_BRAND_LBL)!,
-                      style: Theme.of(context)
-                          .textTheme
-                          .titleMedium!
-                          .copyWith(color: fontColor),
-                    ),
+                ),
+                title: Center(
+                  child: Text(
+                    getTranslated(context, SEL_BRAND_LBL)!,
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleMedium!
+                        .copyWith(color: fontColor),
                   ),
-                  content: SizedBox(
-                      width: double.maxFinite,
-                      child: SingleChildScrollView(
-                        controller: brandScrollController,
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: brandList
-                                .asMap()
-                                .map(
-                                  (index, element) => MapEntry(
-                                    index,
-                                    InkWell(
-                                      onTap: () {
-                                        Navigator.pop(context);
-                                        selectedBrandName =
-                                            brandList[index].name;
-                                        selectedBrandId = brandList[index].id;
-                                        setState(() {});
-                                      },
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
+                ),
+                content: SizedBox(
+                  width: double.maxFinite,
+                  child: SingleChildScrollView(
+                    controller: brandScrollController,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: brandList
+                          .asMap()
+                          .map(
+                            (index, element) => MapEntry(
+                              index,
+                              InkWell(
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  selectedBrandName = brandList[index].name;
+                                  selectedBrandId = brandList[index].id;
+                                  setState(() {});
+                                },
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Divider(),
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                        left: 10,
+                                        right: 10,
+                                      ),
+                                      child: Row(
                                         children: [
-                                          const Divider(),
-                                          Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 10, right: 10,),
-                                              child: Row(
-                                                children: [
-                                                  if (selectedBrandId ==
-                                                          brandList[index].id) Container(
-                                                          height: 20,
-                                                          width: 20,
-                                                          decoration:
-                                                              const BoxDecoration(
-                                                            color: lightBlack2,
-                                                            shape:
-                                                                BoxShape.circle,
-                                                          ),
-                                                          child: Center(
-                                                            child: Container(
-                                                              height: 16,
-                                                              width: 16,
-                                                              decoration:
-                                                                  const BoxDecoration(
-                                                                color: primary,
-                                                                shape: BoxShape
-                                                                    .circle,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ) else Container(
-                                                          height: 20,
-                                                          width: 20,
-                                                          decoration:
-                                                              const BoxDecoration(
-                                                            color: lightBlack2,
-                                                            shape:
-                                                                BoxShape.circle,
-                                                          ),
-                                                          child: Center(
-                                                            child: Container(
-                                                              height: 16,
-                                                              width: 16,
-                                                              decoration:
-                                                                  const BoxDecoration(
-                                                                color: white,
-                                                                shape: BoxShape
-                                                                    .circle,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                  const SizedBox(
-                                                    width: 10,
+                                          if (selectedBrandId ==
+                                              brandList[index].id)
+                                            Container(
+                                              height: 20,
+                                              width: 20,
+                                              decoration: const BoxDecoration(
+                                                color: lightBlack2,
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: Center(
+                                                child: Container(
+                                                  height: 16,
+                                                  width: 16,
+                                                  decoration:
+                                                      const BoxDecoration(
+                                                    color: primary,
+                                                    shape: BoxShape.circle,
                                                   ),
-                                                  SizedBox(
-                                                    width: deviceWidth * 0.6,
-                                                    child: Text(
-                                                      brandList[index].name!,
-                                                      style: const TextStyle(
-                                                        fontSize: 18,
-                                                      ),
-                                                      maxLines: 1,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                    ),
+                                                ),
+                                              ),
+                                            )
+                                          else
+                                            Container(
+                                              height: 20,
+                                              width: 20,
+                                              decoration: const BoxDecoration(
+                                                color: lightBlack2,
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: Center(
+                                                child: Container(
+                                                  height: 16,
+                                                  width: 16,
+                                                  decoration:
+                                                      const BoxDecoration(
+                                                    color: white,
+                                                    shape: BoxShape.circle,
                                                   ),
-                                                ],
-                                              ),),
-                                          const Divider(),
+                                                ),
+                                              ),
+                                            ),
+                                          const SizedBox(
+                                            width: 10,
+                                          ),
+                                          SizedBox(
+                                            width: deviceWidth * 0.6,
+                                            child: Text(
+                                              brandList[index].name!,
+                                              style: const TextStyle(
+                                                fontSize: 18,
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
                                         ],
                                       ),
                                     ),
-                                  ),
-                                )
-                                .values
-                                .toList(),),
-                      ), /*ListView.builder(
+                                    const Divider(),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          )
+                          .values
+                          .toList(),
+                    ),
+                  ), /*ListView.builder(
                         shrinkWrap: true,
                         padding: const EdgeInsetsDirectional.only(
                             bottom: 5, start: 10, end: 10),
@@ -7003,8 +7324,11 @@ class _EditProductState extends State<EditProduct>
                           return item == null ? Container() : getbrands(index);
                         },
                       )*/
-                      ),),);
-        },);
+                ),
+              ),
+            );
+          },
+        );
       },
     );
   }
@@ -7026,41 +7350,44 @@ class _EditProductState extends State<EditProduct>
               const Divider(),
               Row(
                 children: [
-                  if (selectedBrandId == brandList[index].id) Container(
-                          height: 20,
-                          width: 20,
+                  if (selectedBrandId == brandList[index].id)
+                    Container(
+                      height: 20,
+                      width: 20,
+                      decoration: const BoxDecoration(
+                        color: lightBlack2,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: Container(
+                          height: 16,
+                          width: 16,
                           decoration: const BoxDecoration(
-                            color: lightBlack2,
+                            color: primary,
                             shape: BoxShape.circle,
-                          ),
-                          child: Center(
-                            child: Container(
-                              height: 16,
-                              width: 16,
-                              decoration: const BoxDecoration(
-                                color: primary,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                          ),
-                        ) else Container(
-                          height: 20,
-                          width: 20,
-                          decoration: const BoxDecoration(
-                            color: lightBlack2,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Center(
-                            child: Container(
-                              height: 16,
-                              width: 16,
-                              decoration: const BoxDecoration(
-                                color: white,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
                           ),
                         ),
+                      ),
+                    )
+                  else
+                    Container(
+                      height: 20,
+                      width: 20,
+                      decoration: const BoxDecoration(
+                        color: lightBlack2,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: Container(
+                          height: 16,
+                          width: 16,
+                          decoration: const BoxDecoration(
+                            color: white,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ),
+                    ),
                   const SizedBox(
                     width: 10,
                   ),
@@ -7169,11 +7496,15 @@ class _EditProductState extends State<EditProduct>
     if (form.validate()) {
       if (productType == null) {
         setsnackbar(
-            getTranslated(context, PleaseselectproducttypeText)!, context,);
+          getTranslated(context, PleaseselectproducttypeText)!,
+          context,
+        );
         return false;
       } else if (productImage == '' && mainImageProductImage == "") {
         setsnackbar(
-            getTranslated(context, PleaseaddproductimageText)!, context,);
+          getTranslated(context, PleaseaddproductimageText)!,
+          context,
+        );
         return false;
       } else if (selectedCatID == null) {
         setsnackbar(getTranslated(context, PleaseselectcategoryText)!, context);
@@ -7184,7 +7515,9 @@ class _EditProductState extends State<EditProduct>
       } else if (productType == 'simple_product') {
         if (simpleProductPriceController.text.isEmpty) {
           setsnackbar(
-              getTranslated(context, PleaseenterproductpriceText)!, context,);
+            getTranslated(context, PleaseenterproductpriceText)!,
+            context,
+          );
           return false;
         } else if (simpleProductPriceController.text.isNotEmpty &&
             simpleProductSpecialPriceController.text.isNotEmpty &&
@@ -7195,7 +7528,9 @@ class _EditProductState extends State<EditProduct>
         } else if (_isStockSelected != null && _isStockSelected == true) {
           if (simpleproductSKU == null || simpleproductTotalStock == null) {
             setsnackbar(
-                getTranslated(context, PleaseenterstockdetailsText)!, context,);
+              getTranslated(context, PleaseenterstockdetailsText)!,
+              context,
+            );
             return false;
           }
           return true;
@@ -7206,7 +7541,9 @@ class _EditProductState extends State<EditProduct>
           if (variationList[i].price == null ||
               variationList[i].price!.isEmpty) {
             setsnackbar(
-                getTranslated(context, PleaseenterpricedetailsText)!, context,);
+              getTranslated(context, PleaseenterpricedetailsText)!,
+              context,
+            );
             return false;
           }
         }
@@ -7214,7 +7551,9 @@ class _EditProductState extends State<EditProduct>
           if (variantStockLevelType == "product_level" &&
               (variantproductSKU == null || variantproductTotalStock == null)) {
             setsnackbar(
-                getTranslated(context, PleaseenterstockdetailsText)!, context,);
+              getTranslated(context, PleaseenterstockdetailsText)!,
+              context,
+            );
             return false;
           }
           if (variantStockLevelType == "variable_level") {
@@ -7224,8 +7563,9 @@ class _EditProductState extends State<EditProduct>
                   variationList[i].stock == null ||
                   variationList[i].stock!.isEmpty) {
                 setsnackbar(
-                    getTranslated(context, PleaseenterstockdetailsText)!,
-                    context,);
+                  getTranslated(context, PleaseenterstockdetailsText)!,
+                  context,
+                );
                 return false;
               }
             }
