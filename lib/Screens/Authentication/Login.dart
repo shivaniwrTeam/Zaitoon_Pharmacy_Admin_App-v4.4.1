@@ -23,10 +23,8 @@ class Login extends StatefulWidget {
 
 class _LoginPageState extends State<Login> with TickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  final mobileController =
-      TextEditingController(text: isDemoApp ? "9876543210" : "");
-  final passwordController =
-      TextEditingController(text: isDemoApp ? "12345678" : "");
+  final mobileController = TextEditingController();
+  final passwordController = TextEditingController();
   String? countryName;
   FocusNode? passFocus;
   FocusNode? monoFocus = FocusNode();
