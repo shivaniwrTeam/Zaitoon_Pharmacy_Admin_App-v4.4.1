@@ -174,6 +174,7 @@ class _AddProductState extends State<AddProduct> with TickerProviderStateMixin {
   List<Brand> brandList = [];
   bool? isLoadingMoreBrand;
   int brandOffset = 0;
+  int total = 0;
   bool brandLoading = true;
   final ScrollController brandScrollController = ScrollController();
   List<Brand> tempCountryList = [];
@@ -269,18 +270,19 @@ class _AddProductState extends State<AddProduct> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  _brandScrollListener() async {
-    if (brandScrollController.offset >=
-            brandScrollController.position.maxScrollExtent &&
-        !brandScrollController.position.outOfRange) {
-      if (mounted) {
-        setState(() {
-          isLoadingMoreBrand = true;
+  void _brandScrollListener() {
+    brandScrollController.addListener(() {
+      if (brandScrollController.position.pixels >=
+              brandScrollController.position.maxScrollExtent - 50 &&
+          !isLoadingMoreBrand! &&
+          brandOffset < total) {
+        isLoadingMoreBrand = true;
+        taxesState(() {}); // update loader
+        getBrands().then((_) {
+          taxesState(() {}); // rebuild with new data
         });
-        getBrands();
-        if (mounted) setState(() {});
       }
-    }
+    });
   }
 
   _countryScrollListener() async {
@@ -385,32 +387,27 @@ class _AddProductState extends State<AddProduct> with TickerProviderStateMixin {
         LIMIT: brandPerPage.toString(),
         OFFSET: brandOffset.toString(),
       };
-      apiBaseHelper.postAPICall(getBrandApi, parameter).then(
-        (result) async {
-          final bool error = result['error'];
-          tempBrandList.clear();
-          if (!error) {
-            final data = result['data'];
-            tempBrandList =
-                (data as List).map((data) => Brand.fromJson(data)).toList();
-            brandList.addAll(tempBrandList);
-          }
-          brandLoading = false;
-          isLoadingMoreBrand = false;
-          brandOffset += brandPerPage;
-        },
-        onError: (error) {
-          setsnackbar(
-            error.toString(),
-            context,
-          );
-        },
-      );
+
+      final result = await apiBaseHelper.postAPICall(getBrandApi, parameter);
+
+      final bool error = result['error'];
+      if (!error) {
+        total = result["total"];
+        final data = result['data'] as List;
+        if (data.isNotEmpty) {
+          tempBrandList = data.map((e) => Brand.fromJson(e)).toList();
+
+          brandList.addAll(tempBrandList); // Append to main list
+          brandOffset += brandPerPage; // Increase offset
+        }
+      }
+
+      isLoadingMoreBrand = false;
+      brandLoading = false;
     } catch (e) {
-      setsnackbar(
-        e.toString(),
-        context,
-      );
+      isLoadingMoreBrand = false;
+      brandLoading = false;
+      setsnackbar(e.toString(), context);
     }
   }
 
@@ -421,122 +418,91 @@ class _AddProductState extends State<AddProduct> with TickerProviderStateMixin {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setStater) {
             taxesState = setStater;
-            return ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: 100.0),
-              child: AlertDialog(
-                scrollable: true,
-                contentPadding: EdgeInsets.zero,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(5.0),
-                  ),
+
+            return AlertDialog(
+              scrollable: false, // disable built-in scroll
+              contentPadding: EdgeInsets.zero,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(5.0)),
+              ),
+              title: Center(
+                child: Text(
+                  getTranslated(context, SEL_BRAND_LBL)!,
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleMedium!
+                      .copyWith(color: fontColor),
                 ),
-                title: Center(
-                  child: Text(
-                    getTranslated(context, SEL_BRAND_LBL)!,
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleMedium!
-                        .copyWith(color: fontColor),
-                  ),
-                ),
-                content: SizedBox(
-                  width: double.maxFinite,
-                  child: SingleChildScrollView(
-                    controller: brandScrollController,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: brandList
-                          .asMap()
-                          .map(
-                            (index, element) => MapEntry(
-                              index,
-                              InkWell(
-                                onTap: () {
-                                  Navigator.pop(context);
-                                  selectedBrandName = brandList[index].name;
-                                  selectedBrandId = brandList[index].id;
-                                  setState(() {});
-                                },
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    const Divider(),
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                        left: 10,
-                                        right: 10,
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          if (selectedBrandId ==
-                                              brandList[index].id)
-                                            Container(
-                                              height: 20,
-                                              width: 20,
-                                              decoration: const BoxDecoration(
-                                                color: lightBlack2,
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: Center(
-                                                child: Container(
-                                                  height: 16,
-                                                  width: 16,
-                                                  decoration:
-                                                      const BoxDecoration(
-                                                    color: primary,
-                                                    shape: BoxShape.circle,
-                                                  ),
-                                                ),
-                                              ),
-                                            )
-                                          else
-                                            Container(
-                                              height: 20,
-                                              width: 20,
-                                              decoration: const BoxDecoration(
-                                                color: lightBlack2,
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: Center(
-                                                child: Container(
-                                                  height: 16,
-                                                  width: 16,
-                                                  decoration:
-                                                      const BoxDecoration(
-                                                    color: white,
-                                                    shape: BoxShape.circle,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          const SizedBox(
-                                            width: 10,
-                                          ),
-                                          SizedBox(
-                                            width: deviceWidth * 0.6,
-                                            child: Text(
-                                              brandList[index].name!,
-                                              style: const TextStyle(
-                                                fontSize: 18,
-                                              ),
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                        ],
+              ),
+              content: SizedBox(
+                width: double.maxFinite,
+                height: 400, // must define height to make ListView scrollable
+                child: ListView.builder(
+                  controller: brandScrollController,
+                  itemCount: brandList.length + (isLoadingMoreBrand! ? 1 : 0),
+                  itemBuilder: (context, index) {
+                    if (index < brandList.length) {
+                      return InkWell(
+                        onTap: () {
+                          Navigator.pop(context);
+                          selectedBrandName = brandList[index].name;
+                          selectedBrandId = brandList[index].id;
+                          setState(() {});
+                        },
+                        child: Column(
+                          children: [
+                            const Divider(),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    height: 20,
+                                    width: 20,
+                                    decoration: BoxDecoration(
+                                      color: lightBlack2,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Center(
+                                      child: Container(
+                                        height: 16,
+                                        width: 16,
+                                        decoration: BoxDecoration(
+                                          color: selectedBrandId ==
+                                                  brandList[index].id
+                                              ? primary
+                                              : white,
+                                          shape: BoxShape.circle,
+                                        ),
                                       ),
                                     ),
-                                    const Divider(),
-                                  ],
-                                ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  SizedBox(
+                                    width: deviceWidth * 0.6,
+                                    child: Text(
+                                      brandList[index].name!,
+                                      style: const TextStyle(fontSize: 18),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          )
-                          .values
-                          .toList(),
-                    ),
-                  ),
+                            const Divider(),
+                          ],
+                        ),
+                      );
+                    } else {
+                      // Loader item
+                      return const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 10),
+                        child: Center(child: CircularProgressIndicator()),
+                      );
+                    }
+                  },
                 ),
               ),
             );
@@ -927,6 +893,16 @@ class _AddProductState extends State<AddProduct> with TickerProviderStateMixin {
         },
       );
     }
+  }
+
+  Future<void> _refresh() async {
+    setState(() {
+      brandOffset = 0;
+      total = 0;
+      brandList.clear();
+      isLoadingMoreBrand = false;
+    });
+    await getBrands();
   }
 
   Column addProductName() {
@@ -2928,8 +2904,8 @@ class _AddProductState extends State<AddProduct> with TickerProviderStateMixin {
                 model.children!.isEmpty ? null : model.children![index];
             return item1 == null
                 ? Text(
-                  getTranslated(context, nosubcatText)!,
-                )
+                    getTranslated(context, nosubcatText)!,
+                  )
                 : Column(
                     children: [
                       InkWell(
@@ -2974,10 +2950,9 @@ class _AddProductState extends State<AddProduct> with TickerProviderStateMixin {
                         physics: const NeverScrollableScrollPhysics(),
                         itemCount: item1.children!.length,
                         itemBuilder: (context, index) {
-                          final CategoryModel? item2 =
-                              item1.children!.isEmpty
-                                  ? null
-                                  : item1.children![index];
+                          final CategoryModel? item2 = item1.children!.isEmpty
+                              ? null
+                              : item1.children![index];
                           return item2 == null
                               ? Container()
                               : Column(
@@ -3009,8 +2984,7 @@ class _AddProductState extends State<AddProduct> with TickerProviderStateMixin {
                                                 fontSize: 15,
                                               ),
                                               maxLines: 1,
-                                              overflow:
-                                                  TextOverflow.ellipsis,
+                                              overflow: TextOverflow.ellipsis,
                                             ),
                                           ),
                                         ],
@@ -3019,8 +2993,8 @@ class _AddProductState extends State<AddProduct> with TickerProviderStateMixin {
                                     Container(
                                       child: ListView.builder(
                                         shrinkWrap: true,
-                                        padding: const EdgeInsetsDirectional
-                                            .only(
+                                        padding:
+                                            const EdgeInsetsDirectional.only(
                                           bottom: 5,
                                           start: 10,
                                           end: 10,
@@ -3068,8 +3042,7 @@ class _AddProductState extends State<AddProduct> with TickerProviderStateMixin {
                                                       ),
                                                     ),
                                                     Container(
-                                                      child:
-                                                          ListView.builder(
+                                                      child: ListView.builder(
                                                         shrinkWrap: true,
                                                         padding:
                                                             const EdgeInsetsDirectional
@@ -3081,28 +3054,27 @@ class _AddProductState extends State<AddProduct> with TickerProviderStateMixin {
                                                         physics:
                                                             const NeverScrollableScrollPhysics(),
                                                         itemCount: item3
-                                                            .children!
-                                                            .length,
+                                                            .children!.length,
                                                         itemBuilder: (
                                                           context,
                                                           index,
                                                         ) {
                                                           final CategoryModel?
-                                                              item4 =
-                                                              item3.children!
+                                                              item4 = item3
+                                                                      .children!
                                                                       .isEmpty
                                                                   ? null
                                                                   : item3.children![
                                                                       index];
-                                                          return item4 ==
-                                                                  null
+                                                          return item4 == null
                                                               ? Container()
                                                               : Column(
                                                                   children: [
                                                                     InkWell(
                                                                       onTap:
                                                                           () {
-                                                                        setState(() {});
+                                                                        setState(
+                                                                            () {});
                                                                         selectedCatName =
                                                                             item4.name;
                                                                         selectedCatID =
@@ -3112,18 +3084,23 @@ class _AddProductState extends State<AddProduct> with TickerProviderStateMixin {
                                                                           Row(
                                                                         children: [
                                                                           const SizedBox(
-                                                                            width: 10,
+                                                                            width:
+                                                                                10,
                                                                           ),
                                                                           const Icon(
                                                                             Icons.subdirectory_arrow_right_outlined,
-                                                                            color: primary,
-                                                                            size: 20,
+                                                                            color:
+                                                                                primary,
+                                                                            size:
+                                                                                20,
                                                                           ),
                                                                           const SizedBox(
-                                                                            width: 5,
+                                                                            width:
+                                                                                5,
                                                                           ),
                                                                           Expanded(
-                                                                            child: Text(
+                                                                            child:
+                                                                                Text(
                                                                               item4.name!,
                                                                             ),
                                                                           ),
@@ -3131,23 +3108,30 @@ class _AddProductState extends State<AddProduct> with TickerProviderStateMixin {
                                                                       ),
                                                                     ),
                                                                     Container(
-                                                                      child:
-                                                                          ListView.builder(
+                                                                      child: ListView
+                                                                          .builder(
                                                                         shrinkWrap:
                                                                             true,
                                                                         padding:
                                                                             const EdgeInsetsDirectional.only(
-                                                                          bottom: 5,
-                                                                          start: 10,
-                                                                          end: 10,
+                                                                          bottom:
+                                                                              5,
+                                                                          start:
+                                                                              10,
+                                                                          end:
+                                                                              10,
                                                                         ),
                                                                         physics:
                                                                             const NeverScrollableScrollPhysics(),
-                                                                        itemCount:
-                                                                            item4.children!.length,
+                                                                        itemCount: item4
+                                                                            .children!
+                                                                            .length,
                                                                         itemBuilder:
-                                                                            (context, index) {
-                                                                          final CategoryModel? item5 = item4.children!.isEmpty ? null : item4.children![index];
+                                                                            (context,
+                                                                                index) {
+                                                                          final CategoryModel? item5 = item4.children!.isEmpty
+                                                                              ? null
+                                                                              : item4.children![index];
                                                                           return item5 == null
                                                                               ? Container()
                                                                               : Column(

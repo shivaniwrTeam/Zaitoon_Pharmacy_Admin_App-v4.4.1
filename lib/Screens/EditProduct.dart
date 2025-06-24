@@ -196,6 +196,7 @@ class _EditProductState extends State<EditProduct>
   List<Brand> brandList = [];
   bool? isLoadingMoreBrand;
   int brandOffset = 0;
+  int total = 0;
   bool brandLoading = true;
   final ScrollController brandScrollController = ScrollController();
   List<Brand> tempCountryList = [];
@@ -285,47 +286,55 @@ class _EditProductState extends State<EditProduct>
         LIMIT: brandPerPage.toString(),
         OFFSET: brandOffset.toString(),
       };
-      apiBaseHelper.postAPICall(getBrandApi, parameter).then(
-        (result) async {
-          final bool error = result['error'];
-          tempBrandList.clear();
-          if (!error) {
-            final data = result['data'];
-            tempBrandList =
-                (data as List).map((data) => Brand.fromJson(data)).toList();
-            brandList.addAll(tempBrandList);
-          }
-          brandLoading = false;
-          isLoadingMoreBrand = false;
+
+      final result = await apiBaseHelper.postAPICall(getBrandApi, parameter);
+
+      final bool error = result['error'];
+      if (!error) {
+        total = result["total"];
+        final data = result['data'] as List;
+        if (data.isNotEmpty) {
+          List<Brand> temp = data.map((e) => Brand.fromJson(e)).toList();
+          brandList.addAll(temp);
           brandOffset += brandPerPage;
-        },
-        onError: (error) {
-          setsnackbar(
-            error.toString(),
-            context,
-          );
-        },
-      );
+          // --- Sync selectedBrandId if needed ---
+          if (selectedBrandName != null &&
+              (selectedBrandId == null || selectedBrandId!.isEmpty)) {
+            Brand? selectedBrand;
+            for (final b in brandList) {
+              if (b.name == selectedBrandName) {
+                selectedBrand = b;
+                break;
+              }
+            }
+            if (selectedBrand != null) {
+              selectedBrandId = selectedBrand.id;
+            }
+          }
+        }
+      }
+      isLoadingMoreBrand = false;
+      brandLoading = false;
     } catch (e) {
-      setsnackbar(
-        e.toString(),
-        context,
-      );
+      isLoadingMoreBrand = false;
+      brandLoading = false;
+      setsnackbar(e.toString(), context);
     }
   }
 
-  _brandScrollListener() async {
-    if (brandScrollController.offset >=
-            brandScrollController.position.maxScrollExtent &&
-        !brandScrollController.position.outOfRange) {
-      if (mounted) {
-        setState(() {
-          isLoadingMoreBrand = true;
+  void _brandScrollListener() {
+    brandScrollController.addListener(() {
+      if (brandScrollController.position.pixels >=
+              brandScrollController.position.maxScrollExtent - 50 &&
+          !isLoadingMoreBrand! &&
+          brandOffset < total) {
+        isLoadingMoreBrand = true;
+        taxesState(() {}); // update loader
+        getBrands().then((_) {
+          taxesState(() {}); // rebuild with new data
         });
-        getBrands();
-        if (mounted) setState(() {});
       }
-    }
+    });
   }
 
   _countryScrollListener() async {
@@ -7192,138 +7201,112 @@ class _EditProductState extends State<EditProduct>
   }
 
   brandSelectButtomSheet() async {
+    // Sync selectedBrandId if needed before showing the dialog
+    if (selectedBrandName != null &&
+        (selectedBrandId == null || selectedBrandId!.isEmpty)) {
+      Brand? selectedBrand;
+      for (final b in brandList) {
+        if (b.name == selectedBrandName) {
+          selectedBrand = b;
+          break;
+        }
+      }
+      if (selectedBrand != null) {
+        selectedBrandId = selectedBrand.id;
+      }
+    }
     await showDialog(
       context: context,
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setStater) {
             taxesState = setStater;
-            return ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: 100.0),
-              child: AlertDialog(
-                scrollable: true,
-                contentPadding: EdgeInsets.zero,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(5.0),
-                  ),
+
+            return AlertDialog(
+              scrollable: false,
+              contentPadding: EdgeInsets.zero,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(5.0)),
+              ),
+              title: Center(
+                child: Text(
+                  getTranslated(context, SEL_BRAND_LBL)!,
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleMedium!
+                      .copyWith(color: fontColor),
                 ),
-                title: Center(
-                  child: Text(
-                    getTranslated(context, SEL_BRAND_LBL)!,
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleMedium!
-                        .copyWith(color: fontColor),
-                  ),
-                ),
-                content: SizedBox(
-                  width: double.maxFinite,
-                  child: SingleChildScrollView(
-                    controller: brandScrollController,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: brandList
-                          .asMap()
-                          .map(
-                            (index, element) => MapEntry(
-                              index,
-                              InkWell(
-                                onTap: () {
-                                  Navigator.pop(context);
-                                  selectedBrandName = brandList[index].name;
-                                  selectedBrandId = brandList[index].id;
-                                  setState(() {});
-                                },
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    const Divider(),
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                        left: 10,
-                                        right: 10,
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          if (selectedBrandId ==
-                                              brandList[index].id)
-                                            Container(
-                                              height: 20,
-                                              width: 20,
-                                              decoration: const BoxDecoration(
-                                                color: lightBlack2,
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: Center(
-                                                child: Container(
-                                                  height: 16,
-                                                  width: 16,
-                                                  decoration:
-                                                      const BoxDecoration(
-                                                    color: primary,
-                                                    shape: BoxShape.circle,
-                                                  ),
-                                                ),
-                                              ),
-                                            )
-                                          else
-                                            Container(
-                                              height: 20,
-                                              width: 20,
-                                              decoration: const BoxDecoration(
-                                                color: lightBlack2,
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: Center(
-                                                child: Container(
-                                                  height: 16,
-                                                  width: 16,
-                                                  decoration:
-                                                      const BoxDecoration(
-                                                    color: white,
-                                                    shape: BoxShape.circle,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          const SizedBox(
-                                            width: 10,
-                                          ),
-                                          SizedBox(
-                                            width: deviceWidth * 0.6,
-                                            child: Text(
-                                              brandList[index].name!,
-                                              style: const TextStyle(
-                                                fontSize: 18,
-                                              ),
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                        ],
+              ),
+              content: SizedBox(
+                width: double.maxFinite,
+                height: 400,
+                child: ListView.builder(
+                  controller: brandScrollController,
+                  itemCount: brandList.length + (isLoadingMoreBrand! ? 1 : 0),
+                  itemBuilder: (context, index) {
+                    if (index < brandList.length) {
+                      print(
+                          "selectedBrandId: $selectedBrandId ------> $selectedBrandName");
+                      return InkWell(
+                        onTap: () {
+                          Navigator.pop(context);
+                          selectedBrandName = brandList[index].name;
+                          selectedBrandId = brandList[index].id; // <-- Set id!
+                          setState(() {});
+                        },
+                        child: Column(
+                          children: [
+                            const Divider(),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    height: 20,
+                                    width: 20,
+                                    decoration: const BoxDecoration(
+                                      color: lightBlack2,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Center(
+                                      child: Container(
+                                        height: 16,
+                                        width: 16,
+                                        decoration: BoxDecoration(
+                                          color: selectedBrandId?.toString() ==
+                                                  brandList[index].id.toString()
+                                              ? primary
+                                              : white,
+                                          shape: BoxShape.circle,
+                                        ),
                                       ),
                                     ),
-                                    const Divider(),
-                                  ],
-                                ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  SizedBox(
+                                    width: deviceWidth * 0.6,
+                                    child: Text(
+                                      brandList[index].name!,
+                                      style: const TextStyle(fontSize: 18),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          )
-                          .values
-                          .toList(),
-                    ),
-                  ), /*ListView.builder(
-                        shrinkWrap: true,
-                        padding: const EdgeInsetsDirectional.only(
-                            bottom: 5, start: 10, end: 10),
-                        itemCount: brandList.length,
-                        itemBuilder: (context, index) {
-                          Brand? item;
-                          item = brandList.isEmpty ? null : brandList[index];
-                          return item == null ? Container() : getbrands(index);
-                        },
-                      )*/
+                            const Divider(),
+                          ],
+                        ),
+                      );
+                    } else {
+                      return const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 10),
+                        child: Center(child: CircularProgressIndicator()),
+                      );
+                    }
+                  },
                 ),
               ),
             );
@@ -7341,7 +7324,7 @@ class _EditProductState extends State<EditProduct>
           onTap: () {
             Navigator.pop(context);
             selectedBrandName = brandList[index].name;
-            selectedBrandId = brandList[index].id;
+            selectedBrandId = brandList[index].id; // <-- Set id!
             setState(() {});
           },
           child: Column(

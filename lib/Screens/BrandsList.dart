@@ -25,14 +25,23 @@ class StateBrandsList extends State<BrandsList> with TickerProviderStateMixin {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
   bool _isLoading = true;
+  ScrollController controller = ScrollController();
   List<Brand> brandList = [];
   List<Brand> tempList = [];
+  int offset = 0;
+  int total = 0;
+
   @override
   void initState() {
     super.initState();
+    controller.addListener(_scrollListener);
+    offset = 0;
+    total = 0;
     getBrand();
     buttonController = AnimationController(
-        duration: const Duration(milliseconds: 2000), vsync: this,);
+      duration: const Duration(milliseconds: 2000),
+      vsync: this,
+    );
     buttonSqueezeanimation = Tween(
       begin: deviceWidth * 0.7,
       end: 50.0,
@@ -47,6 +56,18 @@ class StateBrandsList extends State<BrandsList> with TickerProviderStateMixin {
     );
   }
 
+  void _scrollListener() {
+    if (controller.offset >= controller.position.maxScrollExtent &&
+        !controller.position.outOfRange &&
+        offset < total &&
+        !isLoadingmore) {
+      setState(() {
+        isLoadingmore = true;
+      });
+      getBrand();
+    }
+  }
+
   Future<void> _playAnimation() async {
     try {
       await buttonController!.forward();
@@ -58,65 +79,69 @@ class StateBrandsList extends State<BrandsList> with TickerProviderStateMixin {
       _isNetworkAvail = await isNetworkAvailable();
       if (_isNetworkAvail) {
         try {
-          final Response response = await post(getBrandApi, headers: headers)
-              .timeout(const Duration(seconds: timeOut));
-          print(
-              "API is $getProductApi \n  \n response : ${response.body}",);
+          final parameter = {
+            LIMIT: perPage.toString(),
+            OFFSET: offset.toString(),
+          };
+          final Response response =
+              await post(getBrandApi, headers: headers, body: parameter)
+                  .timeout(const Duration(seconds: timeOut));
+          print("API is $getProductApi \n  \n response : ${response.body}");
+
           if (response.statusCode == 200) {
             final getdata = json.decode(response.body);
             final bool error = getdata["error"];
             final String? msg = getdata["message"];
+
             if (!error) {
-              tempList.clear();
-              final data = getdata["data"];
-              tempList =
-                  (data as List).map((data) => Brand.fromJson(data)).toList();
-              brandList.addAll(tempList);
+              total = getdata["total"];
+
+              if (offset < total) {
+                final data = getdata["data"];
+                tempList.clear();
+                tempList =
+                    (data as List).map((data) => Brand.fromJson(data)).toList();
+
+                brandList.addAll(tempList);
+                offset = offset + perPage;
+              }
             } else {
               setsnackbar(msg!, context);
             }
+
             if (mounted) {
-              setState(
-                () {
-                  _isLoading = false;
-                },
-              );
+              setState(() {
+                _isLoading = false;
+                isLoadingmore = false;
+              });
             }
           }
         } on TimeoutException catch (_) {
           setsnackbar(somethingMSg, context);
           if (mounted) {
-            setState(
-              () {
-                _isLoading = false;
-              },
-            );
+            setState(() {
+              _isLoading = false;
+              isLoadingmore = false;
+            });
           }
         }
       } else {
         if (mounted) {
-          setState(
-            () {
-              _isNetworkAvail = false;
-            },
-          );
+          setState(() {
+            _isNetworkAvail = false;
+          });
         }
       }
     } else {
       if (mounted) {
-        setState(
-          () {
-            _isLoading = false;
-          },
-        );
+        setState(() {
+          _isLoading = false;
+        });
       }
-      Future.delayed(const Duration(microseconds: 500)).then(
-        (_) async {
-          setsnackbar(getTranslated(context, readProductText)!, context);
-        },
-      );
+      Future.delayed(const Duration(microseconds: 500)).then((_) {
+        setsnackbar(getTranslated(context, readProductText)!, context);
+      });
     }
-    return;
   }
 
   updateBrand() {
@@ -128,12 +153,12 @@ class StateBrandsList extends State<BrandsList> with TickerProviderStateMixin {
 
   Future<void> _refresh() {
     if (mounted) {
-      setState(
-        () {
-          _isLoading = true;
-          brandList.clear();
-        },
-      );
+      setState(() {
+        _isLoading = true;
+        brandList.clear();
+        offset = 0;
+        total = 0;
+      });
     }
     return getBrand();
   }
@@ -157,112 +182,138 @@ class StateBrandsList extends State<BrandsList> with TickerProviderStateMixin {
               ? shimmer()
               : Padding(
                   padding: const EdgeInsetsDirectional.only(
-                      top: 25.0, start: 15, end: 15,),
+                    top: 25.0,
+                    start: 15,
+                    end: 15,
+                  ),
                   child: RefreshIndicator(
                     key: _refreshIndicatorKey,
                     onRefresh: _refresh,
                     child: GridView.builder(
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                crossAxisSpacing: 20,
-                                mainAxisSpacing: 20,
-                                childAspectRatio: 2 / 1.83,),
-                        shrinkWrap: true,
-                        itemCount: brandList.length,
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        itemBuilder: (context, index) {
-                          return InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                CupertinoPageRoute(
-                                  builder: (context) => EditBrand(
-                                      model: brandList[index],
-                                      index: index,
-                                      updateBrand: updateBrand,),
+                      controller: controller,
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 20,
+                        mainAxisSpacing: 20,
+                        childAspectRatio: 2 / 1.83,
+                      ),
+                      shrinkWrap: true,
+                      itemCount: (offset < total)
+                          ? brandList.length + 1
+                          : brandList.length,
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      itemBuilder: (context, index) {
+                        if (index == brandList.length) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+                        return InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              CupertinoPageRoute(
+                                builder: (context) => EditBrand(
+                                  model: brandList[index],
+                                  index: index,
+                                  updateBrand: updateBrand,
                                 ),
-                              );
-                            },
-                            child: Container(
-                                padding: EdgeInsets.zero,
-                                decoration: BoxDecoration(
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(15),),
-                                    border: Border.all(
-                                        color: lightBlack.withOpacity(0.7),),),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
+                              ),
+                            );
+                          },
+                          child: Container(
+                            padding: EdgeInsets.zero,
+                            decoration: BoxDecoration(
+                              borderRadius: const BorderRadius.all(
+                                Radius.circular(15),
+                              ),
+                              border: Border.all(
+                                color: lightBlack.withOpacity(0.7),
+                              ),
+                            ),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Stack(
                                   children: [
-                                    Stack(
-                                      children: [
-                                        ClipRRect(
-                                          borderRadius: const BorderRadius.all(
-                                              Radius.circular(15),),
-                                          child: Hero(
-                                            tag: "$index${brandList[index].id}",
-                                            child: FadeInImage(
-                                              fadeInDuration: const Duration(
-                                                  milliseconds: 150,),
-                                              image: NetworkImage(
-                                                  brandList[index].image!,),
-                                              height: deviceHeight / 7,
-                                              width: double.maxFinite,
-                                              fit: BoxFit.fill,
-                                              imageErrorBuilder: (context,
-                                                  error, stackTrace,) {
-                                                return erroWidget(
-                                                  width,
-                                                );
-                                              },
-                                              placeholder: placeHolder(width),
+                                    ClipRRect(
+                                      borderRadius: const BorderRadius.all(
+                                        Radius.circular(15),
+                                      ),
+                                      child: Hero(
+                                        tag: "$index${brandList[index].id}",
+                                        child: FadeInImage(
+                                          fadeInDuration: const Duration(
+                                            milliseconds: 150,
+                                          ),
+                                          image: NetworkImage(
+                                            brandList[index].image!,
+                                          ),
+                                          height: deviceHeight / 7.2,
+                                          width: double.maxFinite,
+                                          fit: BoxFit.fill,
+                                          imageErrorBuilder: (
+                                            context,
+                                            error,
+                                            stackTrace,
+                                          ) {
+                                            return erroWidget(
+                                              width,
+                                            );
+                                          },
+                                          placeholder: placeHolder(width),
+                                        ),
+                                      ),
+                                    ),
+                                    Positioned.directional(
+                                      top: 5,
+                                      end: 5,
+                                      textDirection: Directionality.of(context),
+                                      child: InkWell(
+                                        child: Container(
+                                          height: 27,
+                                          width: 27,
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(
+                                              5.0,
                                             ),
+                                            color: Colors.white,
+                                          ),
+                                          alignment: Alignment.center,
+                                          child: const Icon(
+                                            Icons.delete,
+                                            size: 20,
                                           ),
                                         ),
-                                        Positioned.directional(
-                                            top: 5,
-                                            end: 5,
-                                            textDirection:
-                                                Directionality.of(context),
-                                            child: InkWell(
-                                              child: Container(
-                                                height: 27,
-                                                width: 27,
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          5.0,),
-                                                  color: Colors.white,
-                                                ),
-                                                alignment: Alignment.center,
-                                                child: const Icon(Icons.delete,
-                                                    size: 20,),
-                                              ),
-                                              onTap: () {
-                                                brandDeletDialog(
-                                                    brandList[index].name!,
-                                                    brandList[index].id!,);
-                                              },
-                                            ),),
-                                      ],
-                                    ),
-                                    Padding(
-                                      padding:
-                                          const EdgeInsetsDirectional.all(3),
-                                      child: Text(
-                                        brandList[index].name!,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleMedium!
-                                            .copyWith(color: fontColor),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
+                                        onTap: () {
+                                          brandDeletDialog(
+                                            brandList[index].name!,
+                                            brandList[index].id!,
+                                          );
+                                        },
                                       ),
                                     ),
                                   ],
-                                ),),
-                          );
-                        },),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsetsDirectional.all(3),
+                                  child: Text(
+                                    brandList[index].name!,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium!
+                                        .copyWith(color: fontColor),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 )
           : noInternet(context),
@@ -293,11 +344,11 @@ class StateBrandsList extends State<BrandsList> with TickerProviderStateMixin {
                 TextButton(
                   child: Text(
                     getTranslated(context, LOGOUTNO)!,
-                    style: Theme.of(this.context)
-                        .textTheme
-                        .titleSmall!
-                        .copyWith(
-                            color: lightBlack, fontWeight: FontWeight.bold,),
+                    style:
+                        Theme.of(this.context).textTheme.titleSmall!.copyWith(
+                              color: lightBlack,
+                              fontWeight: FontWeight.bold,
+                            ),
                   ),
                   onPressed: () {
                     Navigator.of(context).pop(false);
@@ -306,11 +357,11 @@ class StateBrandsList extends State<BrandsList> with TickerProviderStateMixin {
                 TextButton(
                   child: Text(
                     getTranslated(context, LOGOUTYES)!,
-                    style: Theme.of(this.context)
-                        .textTheme
-                        .titleSmall!
-                        .copyWith(
-                            color: fontColor, fontWeight: FontWeight.bold,),
+                    style:
+                        Theme.of(this.context).textTheme.titleSmall!.copyWith(
+                              color: fontColor,
+                              fontWeight: FontWeight.bold,
+                            ),
                   ),
                   onPressed: () {
                     Navigator.pop(context);
